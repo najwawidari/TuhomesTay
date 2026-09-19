@@ -1,24 +1,18 @@
-<?php
-session_start();
-
-// =====================================================
-// STATUS LOGIN (samakan dengan pola di login.php / beranda)
-// =====================================================
-$currentUser = $_SESSION['user'] ?? null;
-$isLoggedIn  = $currentUser !== null;
-$userPhoto   = $currentUser['photo'] ?? null;
-?>
+@php
+    $currentUser = session('user') ?? null;
+    $isLoggedIn  = $currentUser !== null;
+    $userPhoto   = $currentUser['photo'] ?? null;
+@endphp
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tentang Kami - TuhomesTay Tulungagung & Batu</title>
+    <title>{{ __('Tentang Kami') }} - TuhomesTay Tulungagung & Batu</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Itim&family=Konkhmer+Sleokchher&family=Poppins:wght@400;500;600;700;800&family=Bodoni+Moda:ital,wght@0,400;1,400;1,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <base target="_blank">
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -42,14 +36,16 @@ $userPhoto   = $currentUser['photo'] ?? null;
         }
         #page-transition.hide { opacity: 0; }
 
-        @view-transition { navigation: auto; }
-        .nav-links a.active { view-transition-name: nav-highlight; }
-        ::view-transition-group(nav-highlight) {
-            animation-duration: 0.45s;
-            animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        /* ===== KONSISTEN CONTAINER UNTUK SEMUA SECTION ===== */
+        .section-container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: clamp(20px, 4vw, 48px);
+            padding-right: clamp(20px, 4vw, 48px);
         }
 
-        /* ===== NAVBAR (disamakan dengan beranda) ===== */
+        /* ===== NAVBAR ===== */
         .nav-wrap {
             position: fixed;
             top: 0; left: 0; width: 100%;
@@ -71,7 +67,7 @@ $userPhoto   = $currentUser['photo'] ?? null;
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            max-width: 1400px;
+            max-width: 1280px;
             gap: clamp(8px, 1.6vw, 20px);
         }
         .nav-actions {
@@ -90,16 +86,20 @@ $userPhoto   = $currentUser['photo'] ?? null;
             flex-shrink: 0; user-select: none;
         }
         .nav-wrap.scrolled .lang-switch { color: #3B2A20; }
+        .lang-switch a,
         .lang-switch button {
             background: none; border: none; padding: 0; margin: 0;
             font: inherit; color: inherit; cursor: pointer;
             opacity: 0.6; transition: opacity 0.2s ease;
+            text-decoration: none;
         }
+        .lang-switch a.active,
         .lang-switch button.active { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
+        .lang-switch a:hover,
         .lang-switch button:hover { opacity: 1; }
         .lang-switch .lang-sep { opacity: 0.5; }
 
-        /* ===== SEARCH (icon -> expand) ===== */
+        /* ===== SEARCH ===== */
         .nav-search {
             display: flex; align-items: center; gap: 6px;
             background-color: transparent;
@@ -132,18 +132,11 @@ $userPhoto   = $currentUser['photo'] ?? null;
         }
         .nav-search input::placeholder { color: #808080; }
         .nav-search-btn {
-            width: 26px; height: 26px;
-            border-radius: 50%;
-            background: transparent;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            cursor: pointer;
-            flex-shrink: 0;
-            color: #FAF7F0;
-            transition: color 0.2s ease;
+            width: 26px; height: 26px; border-radius: 50%;
+            background: transparent; border: none;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; cursor: pointer; flex-shrink: 0;
+            color: #FAF7F0; transition: color 0.2s ease;
         }
         .nav-wrap.scrolled .nav-search-btn { color: #3B2A20; }
         .nav-search.expanded .nav-search-btn { color: #CACACA; }
@@ -266,13 +259,14 @@ $userPhoto   = $currentUser['photo'] ?? null;
         }
         .nav-overlay.open { display: block; opacity: 1; }
 
-        /* ===== HERO – 1 FULL PAGE ===== */
+        /* ===== HERO ===== */
         .hero-kontak {
             position: relative;
             width: 100%;
             height: 100svh;
             min-height: 100svh;
-            background: url('image/hubungikami.png') center / cover no-repeat;
+            background: url('{{ asset('storage/properti/pusattulungagung.png') }}') center / cover no-repeat;
+            background-color: #3B2A20;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -320,12 +314,10 @@ $userPhoto   = $currentUser['photo'] ?? null;
         /* ===== SEJARAH ===== */
         .sejarah-section {
             background-color: #F2E7D5;
-            padding: clamp(48px, 6vw, 80px) 24px;
+            padding-top: clamp(48px, 6vw, 80px);
+            padding-bottom: clamp(48px, 6vw, 80px);
         }
         .sejarah-inner {
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
             display: grid;
             grid-template-columns: minmax(280px, 420px) 1fr;
             gap: clamp(28px, 4vw, 52px);
@@ -364,12 +356,10 @@ $userPhoto   = $currentUser['photo'] ?? null;
         /* ===== CABANG ===== */
         .cabang-section {
             background-color: #FAF7F0;
-            padding: clamp(40px, 5vw, 64px) 24px;
+            padding-top: clamp(48px, 6vw, 80px);
+            padding-bottom: clamp(48px, 6vw, 80px);
         }
         .cabang-inner {
-            width: 100%;
-            max-width: 960px;
-            margin: 0 auto;
             text-align: center;
         }
         .cabang-inner > h2 {
@@ -377,12 +367,12 @@ $userPhoto   = $currentUser['photo'] ?? null;
             font-weight: 600;
             font-size: clamp(1.5rem, 2.6vw, 2.1rem);
             color: #3B2A20;
-            margin-bottom: clamp(24px, 3.5vw, 36px);
+            margin-bottom: clamp(32px, 4vw, 44px);
         }
         .cabang-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: clamp(20px, 3vw, 36px);
+            gap: clamp(24px, 3vw, 40px);
         }
         .cabang-card { text-align: center; }
         .cabang-card img {
@@ -390,7 +380,7 @@ $userPhoto   = $currentUser['photo'] ?? null;
             max-width: 380px;
             border-radius: 14px;
             box-shadow: 0 6px 18px rgba(59,42,32,0.12);
-            margin-bottom: 14px;
+            margin-bottom: 16px;
             aspect-ratio: 4 / 3;
             object-fit: cover;
             min-height: 200px;
@@ -401,29 +391,27 @@ $userPhoto   = $currentUser['photo'] ?? null;
             font-weight: 700;
             font-size: clamp(1rem, 1.3vw, 1.15rem);
             color: #3B2A20;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
         .cabang-card p {
             font-family: 'Poppins', sans-serif;
             font-size: clamp(0.82rem, 1.05vw, 0.92rem);
-            line-height: 1.55;
+            line-height: 1.6;
             color: #7B5E4A;
             opacity: 0.88;
-            max-width: 320px;
+            max-width: 340px;
             margin: 0 auto;
         }
 
         /* ===== CONTACT ===== */
         .contact-section {
-            padding: clamp(48px, 6vw, 80px) 24px;
+            padding-top: clamp(48px, 6vw, 80px);
+            padding-bottom: clamp(48px, 6vw, 80px);
             background-color: #F2E7D5;
         }
         .contact-inner {
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
             display: grid;
-            grid-template-columns: minmax(260px, 380px) 1fr;
+            grid-template-columns: minmax(280px, 400px) 1fr;
             gap: clamp(28px, 4vw, 52px);
             align-items: start;
         }
@@ -470,7 +458,7 @@ $userPhoto   = $currentUser['photo'] ?? null;
             width: 100%;
             aspect-ratio: 4 / 3;
             min-height: 220px;
-            max-height: 260px;
+            max-height: 280px;
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 5px 14px rgba(59,42,32,0.1);
@@ -496,7 +484,7 @@ $userPhoto   = $currentUser['photo'] ?? null;
             color: #7B5E4A;
             opacity: 0.88;
             margin-bottom: 20px;
-            max-width: 480px;
+            max-width: 520px;
         }
         .form-group { margin-bottom: 16px; }
         .form-group label {
@@ -556,12 +544,47 @@ $userPhoto   = $currentUser['photo'] ?? null;
             background-color: #3B2A20;
             transform: translateY(-2px);
         }
+        .kirim-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-        /* ===== FOOTER (disamakan dengan beranda) ===== */
+        /* ===== ALERT ===== */
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .alert-success i { margin-top: 2px; }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+        }
+        .alert-error ul { margin-left: 18px; margin-top: 6px; }
+        .alert-error li { margin-bottom: 3px; }
+
+        /* ===== FOOTER ===== */
         footer {
             background-color: #7B5E4A;
             color: #F2E7D5;
-            padding: 36px clamp(24px, 4vw, 44px) 20px;
+            padding-top: 40px;
+            padding-bottom: 22px;
             position: relative;
             border-radius: 28px 28px 0 0;
             font-family: 'Poppins', sans-serif;
@@ -569,18 +592,17 @@ $userPhoto   = $currentUser['photo'] ?? null;
             z-index: 2;
         }
         .footer-container {
-            max-width: 1100px;
-            margin: 0 auto 22px;
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             column-gap: 40px;
-            row-gap: 22px;
+            row-gap: 24px;
+            margin-bottom: 24px;
         }
         .footer-about { flex: 1 1 240px; min-width: 220px; }
         .footer-about p {
             font-size: 0.88rem;
-            line-height: 1.55;
+            line-height: 1.6;
             margin-bottom: 14px;
             max-width: 280px;
             color: #F2E7D5;
@@ -629,7 +651,7 @@ $userPhoto   = $currentUser['photo'] ?? null;
         .copyright {
             text-align: center;
             border-top: 1px solid rgba(242,234,215,0.18);
-            padding-top: 14px;
+            padding-top: 16px;
             font-size: 0.78rem;
             color: #F2E7D5;
             opacity: 0.7;
@@ -691,10 +713,7 @@ $userPhoto   = $currentUser['photo'] ?? null;
             .drawer-logo-item .logo-image { height: 34px; }
             .nav-search.expanded { width: clamp(160px, 46vw, 240px); }
             .cabang-grid { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; }
-            .hero-kontak {
-                height: 100svh;
-                min-height: 100svh;
-            }
+            .hero-kontak { height: 100svh; min-height: 100svh; }
             .sejarah-img img { min-height: 220px; }
             .cabang-card img { min-height: 180px; max-height: 200px; }
         }
@@ -709,44 +728,48 @@ $userPhoto   = $currentUser['photo'] ?? null;
     <div id="page-transition"></div>
     <div class="nav-overlay" id="navOverlay"></div>
 
-    <!-- NAVBAR (disamakan dengan beranda) -->
+    {{-- NAVBAR --}}
     <div class="nav-wrap" id="navWrap">
         <nav class="navbar">
-            <a href="#beranda-kontak" class="logo-container">
-                <img src="image/logo.png" alt="Tuhomestay Logo" class="logo-image" onerror="this.src='https://placehold.co/120x40/7B5E4A/ffffff?text=Tuhomestay'">
+            <a href="{{ url('/') }}" class="logo-container">
+                <img src="{{ asset('image/logo.png') }}" alt="Tuhomestay Logo" class="logo-image"
+                     onerror="this.src='https://placehold.co/120x40/7B5E4A/ffffff?text=Tuhomestay'">
             </a>
             <ul class="nav-links" id="navLinks">
                 <li class="drawer-logo-item">
-                    <img src="image/logo.png" alt="Tuhomestay Logo" class="logo-image" onerror="this.src='https://placehold.co/120x50/F2E7D5/3B2A20?text=Tuhomestay'">
+                    <img src="{{ asset('image/logo.png') }}" alt="Tuhomestay Logo" class="logo-image"
+                         onerror="this.src='https://placehold.co/120x50/F2E7D5/3B2A20?text=Tuhomestay'">
                 </li>
-                <li><a href="/">Beranda</a></li>
-                <li><a href="galeri">Galeri</a></li>
-                <li><a href="pilihansewa">Pilihan Sewa</a></li>
-                <li><a href="tentangkami" class="active" aria-current="page">Tentang Kami</a></li>
+                <li><a href="{{ url('/') }}">{{ __('Beranda') }}</a></li>
+                <li><a href="{{ url('/galeri') }}">{{ __('Galeri') }}</a></li>
+                <li><a href="{{ url('/pilihansewa') }}">{{ __('Pilihan Sewa') }}</a></li>
+                <li><a href="{{ url('/tentangkami') }}" class="active" aria-current="page">{{ __('Tentang Kami') }}</a></li>
             </ul>
             <div class="nav-actions">
                 <div class="lang-switch" id="langSwitch" aria-label="Pilih bahasa">
-                    <button type="button" class="lang-btn" data-lang="en">EN</button>
+                    <a href="{{ route('lang.switch', 'en') }}"
+                       class="lang-btn {{ app()->getLocale() === 'en' ? 'active' : '' }}">EN</a>
                     <span class="lang-sep">|</span>
-                    <button type="button" class="lang-btn active" data-lang="id">ID</button>
+                    <a href="{{ route('lang.switch', 'id') }}"
+                       class="lang-btn {{ app()->getLocale() === 'id' ? 'active' : '' }}">ID</a>
                 </div>
 
-                <form class="nav-search" id="navSearchForm" role="search">
-                    <input type="search" id="navSearchInput" placeholder="Pencarian..." aria-label="Cari" enterkeyhint="search" autocomplete="off">
+                <form class="nav-search" id="navSearchForm" role="search" action="{{ url('/pilihansewa') }}" method="GET">
+                    <input type="search" id="navSearchInput" name="q" placeholder="{{ __('Pencarian...') }}" aria-label="Cari" autocomplete="off">
                     <button type="submit" class="nav-search-btn" id="navSearchBtn" aria-label="Cari"><i class="fa-solid fa-magnifying-glass"></i></button>
                 </form>
 
-                <?php if ($isLoggedIn): ?>
-                    <a href="/profil" class="navbar-avatar" aria-label="Profil">
-                        <?php if (!empty($userPhoto)): ?>
-                            <img src="storage/<?= htmlspecialchars($userPhoto) ?>" alt="Profile">
-                        <?php else: ?>
+                @if($isLoggedIn)
+                    <a href="{{ url('/profil') }}" class="navbar-avatar" aria-label="Profil">
+                        @if(!empty($userPhoto))
+                            <img src="{{ asset('storage/' . $userPhoto) }}" alt="Profile">
+                        @else
                             <span class="avatar-placeholder"><i class="fa-solid fa-user"></i></span>
-                        <?php endif; ?>
+                        @endif
                     </a>
-                <?php else: ?>
-                    <a href="/register" class="nav-daftar-btn" id="navDaftarBtn">Daftar | Masuk</a>
-                <?php endif; ?>
+                @else
+                    <a href="{{ url('/register') }}" class="nav-daftar-btn">{{ __('Daftar | Masuk') }}</a>
+                @endif
 
                 <button type="button" class="nav-hamburger" id="navHamburger" aria-label="Buka menu" aria-expanded="false" aria-controls="navLinks">
                     <i class="fa-solid fa-bars"></i>
@@ -755,135 +778,169 @@ $userPhoto   = $currentUser['photo'] ?? null;
         </nav>
     </div>
 
-    <!-- HERO -->
+    {{-- HERO --}}
     <section class="hero-kontak" id="beranda-kontak">
         <div class="hero-kontak-content">
-            <h1>Tentang Kami</h1>
-            <p>Kami siap membantu menjawab pertanyaan dan memberikan<br>informasi yang kamu butuhkan sebelum menginap.</p>
+            <h1>{{ __('Tentang Kami') }}</h1>
+            <p>{!! __('Kami siap membantu menjawab pertanyaan dan memberikan<br>informasi yang kamu butuhkan sebelum menginap.') !!}</p>
         </div>
     </section>
 
-    <!-- SEJARAH -->
+    {{-- SEJARAH --}}
     <section class="sejarah-section">
-        <div class="sejarah-inner">
-            <div class="sejarah-img">
-                <img src="image/cabang-tulungagung.png" alt="Tuhomestay Cabang" onerror="this.src='https://placehold.co/500x380/D1B89A/3B2A20?text=Tuhomestay+2016'">
-            </div>
-            <div class="sejarah-text">
-                <h2>Dibuka & dilaksanakan Tahun 2016</h2>
-                <p>
-                    Nikmati pengalaman menginap yang nyaman di dua cabang kami. Cabang Tulungagung menghadirkan suasana tenang dan asri di Jalan Pahlawan Gang II, Kedungwaru. Sementara cabang Batu,
-                </p>
+        <div class="section-container">
+            <div class="sejarah-inner">
+                <div class="sejarah-img">
+                    <img src="{{ asset('storage/properti/rumah3_tulungagung.jpg') }}" alt="Tuhomestay Cabang"
+                         onerror="this.src='https://placehold.co/500x380/D1B89A/3B2A20?text=Tuhomestay+2016'">
+                </div>
+                <div class="sejarah-text">
+                    <h2>{{ __('Dibuka & dilaksanakan Tahun 2016') }}</h2>
+                    <p>{{ __('Nikmati pengalaman menginap yang nyaman di dua cabang kami. Cabang Tulungagung menghadirkan suasana tenang dan asri di Jalan Pahlawan Gang II, Kedungwaru. Sementara cabang Batu,') }}</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- CABANG -->
+    {{-- CABANG --}}
     <section class="cabang-section">
-        <div class="cabang-inner">
-            <h2>Dimana saja Cabang TuhomesTay ?</h2>
-            <div class="cabang-grid">
-                <div class="cabang-card">
-                    <img src="image/cabang-batu.png" alt="Cabang Batu Malang" onerror="this.src='https://placehold.co/380x280/D1B89A/3B2A20?text=Batu+Malang'">
-                    <h3>Batu, Malang</h3>
-                    <p>Nikmati pengalaman menginap yang nyaman di dua cabang kami. Cabang Tulungagung menghadirkan suasana tenang dan asri di Jalan</p>
-                </div>
-                <div class="cabang-card">
-                    <img src="image/cabang-tulungagung.png" alt="Cabang Tulungagung" onerror="this.src='https://placehold.co/380x280/D1B89A/3B2A20?text=Tulungagung'">
-                    <h3>Tulungagung, Jl Parman</h3>
-                    <p>Nikmati pengalaman menginap yang nyaman di dua cabang kami. Cabang Tulungagung menghadirkan suasana tenang dan asri di Jalan</p>
+        <div class="section-container">
+            <div class="cabang-inner">
+                <h2>{{ __('Dimana saja Cabang TuhomesTay ?') }}</h2>
+                <div class="cabang-grid">
+                    <div class="cabang-card">
+                        <img src="{{ asset('storage/properti/rumah_galeri.jpeg') }}" alt="Cabang Batu Malang"
+                             onerror="this.src='https://placehold.co/380x280/D1B89A/3B2A20?text=Batu+Malang'">
+                        <h3>{{ __('Batu, Malang') }}</h3>
+                        <p>{{ __('Nikmati pengalaman menginap yang nyaman di dua cabang kami. Cabang Tulungagung menghadirkan suasana tenang dan asri di Jalan') }}</p>
+                    </div>
+                    <div class="cabang-card">
+                        <img src="{{ asset('storage/properti/gambar_depan_tulungagung.jpg') }}" alt="Cabang Tulungagung"
+                             onerror="this.src='https://placehold.co/380x280/D1B89A/3B2A20?text=Tulungagung'">
+                        <h3>{{ __('Tulungagung, Jl Parman') }}</h3>
+                        <p>{{ __('Nikmati pengalaman menginap yang nyaman di dua cabang kami. Cabang Tulungagung menghadirkan suasana tenang dan asri di Jalan') }}</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CONTACT -->
+    {{-- CONTACT --}}
     <section class="contact-section" id="kontak-lokasi">
-        <div class="contact-inner">
-            <div class="contact-left">
-                <div class="contact-cards">
-                    <div class="contact-card">
-                        <i class="fa-solid fa-phone"></i>
-                        <h3>telepon</h3>
-                        <p>+62 821-4585-8851</p>
+        <div class="section-container">
+            <div class="contact-inner">
+                <div class="contact-left">
+                    <div class="contact-cards">
+                        <div class="contact-card">
+                            <i class="fa-solid fa-phone"></i>
+                            <h3>{{ __('Telepon') }}</h3>
+                            <p>+62 821-4585-8851</p>
+                        </div>
+                        <div class="contact-card">
+                            <i class="fa-brands fa-whatsapp"></i>
+                            <h3>{{ __('WhatsApp') }}</h3>
+                            <p>+62 821-4585-8851</p>
+                        </div>
+                        <div class="contact-card">
+                            <i class="fa-solid fa-envelope"></i>
+                            <h3>{{ __('Email') }}</h3>
+                            <p>adalah@gmail.com</p>
+                        </div>
+                        <div class="contact-card">
+                            <i class="fa-brands fa-facebook"></i>
+                            <h3>{{ __('Facebook') }}</h3>
+                            <p>@rumahsinggah</p>
+                        </div>
                     </div>
-                    <div class="contact-card">
-                        <i class="fa-brands fa-whatsapp"></i>
-                        <h3>whatsapp</h3>
-                        <p>+62 821-4585-8851</p>
-                    </div>
-                    <div class="contact-card">
-                        <i class="fa-solid fa-envelope"></i>
-                        <h3>email</h3>
-                        <p>adalah@gmail.com</p>
-                    </div>
-                    <div class="contact-card">
-                        <i class="fa-brands fa-facebook"></i>
-                        <h3>facebook</h3>
-                        <p>@rumahsinggah</p>
+                    <div class="contact-map">
+                        <iframe
+                            src="https://maps.google.com/maps?q=Tulungagung&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Lokasi TuhomesTay"></iframe>
                     </div>
                 </div>
-                <div class="contact-map">
-                    <iframe
-                        src="https://maps.google.com/maps?q=Tulungagung&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                        title="Lokasi TuhomesTay"></iframe>
+                <div class="contact-right">
+                    <h2>{{ __('Lebih Dekat dengan TuhomesTay') }}</h2>
+                    <p>{{ __('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.') }}</p>
+
+                    {{-- Alert Sukses --}}
+                    @if(session('contact_success'))
+                        <div class="alert-success">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>{{ session('contact_success') }}</span>
+                        </div>
+                    @endif
+
+                    {{-- Alert Error Validasi --}}
+                    @if($errors->any())
+                        <div class="alert-error">
+                            <strong><i class="fa-solid fa-circle-exclamation"></i> {{ __('Mohon perbaiki kesalahan berikut:') }}</strong>
+                            <ul>
+                                @foreach($errors->all() as $err)
+                                    <li>{{ $err }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form id="contactForm" method="POST" action="{{ route('kontak.store') }}">
+                        @csrf
+                        <div class="form-group">
+                            <label for="email">{{ __('Email') }} *</label>
+                            <input type="email" id="email" name="email"
+                                   value="{{ old('email') }}"
+                                   placeholder="example@gmail.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lokasi">{{ __('Lokasi') }} *</label>
+                            <select id="lokasi" name="lokasi" required>
+                                <option value="" disabled {{ old('lokasi') ? '' : 'selected' }} hidden></option>
+                                <option value="tulungagung" {{ old('lokasi') === 'tulungagung' ? 'selected' : '' }}>Tulungagung</option>
+                                <option value="batu" {{ old('lokasi') === 'batu' ? 'selected' : '' }}>{{ __('Batu, Malang') }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pesan">{{ __('Pesan') }} *</label>
+                            <textarea id="pesan" name="pesan"
+                                      placeholder="{{ __('tulis disini...') }}" required>{{ old('pesan') }}</textarea>
+                        </div>
+                        <button type="submit" class="kirim-btn" id="kirimBtn">{{ __('kirim') }}</button>
+                    </form>
                 </div>
-            </div>
-            <div class="contact-right">
-                <h2>Lebih Dekat dengan TuhomesTay</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                <form id="contactForm">
-                    <div class="form-group">
-                        <label for="email">Email *</label>
-                        <input type="email" id="email" name="email" placeholder="example@gmail.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="lokasi">Lokasi *</label>
-                        <select id="lokasi" name="lokasi" required>
-                            <option value="" disabled selected hidden></option>
-                            <option value="tulungagung">Tulungagung</option>
-                            <option value="batu">Batu, Malang</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="pesan">Pesan *</label>
-                        <textarea id="pesan" name="pesan" placeholder="tulis disini..." required></textarea>
-                    </div>
-                    <button type="submit" class="kirim-btn">kirim</button>
-                </form>
             </div>
         </div>
     </section>
 
-    <!-- FOOTER (disamakan dengan beranda) -->
+    {{-- FOOTER --}}
     <footer>
-        <div class="footer-container">
-            <div class="footer-about">
-                <p>Tulungagung & Batu Homestay menyediakan tempat menginap yang nyaman dan tenang untuk menemani perjalananmu. Temukan pilihan akomodasi yang cocok untuk perjalanan keluarga, maupun kebutuhan menginap lainnya.</p>
-                <div class="social-links">
-                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="https://api.whatsapp.com/send/?phone=6282145858851&text&type=phone_number&app_absent=0"><i class="fa-brands fa-whatsapp"></i></a>
+        <div class="section-container">
+            <div class="footer-container">
+                <div class="footer-about">
+                    <p>{{ __('Tulungagung & Batu Homestay menyediakan tempat menginap yang nyaman dan tenang untuk menemani perjalananmu. Temukan pilihan akomodasi yang cocok untuk perjalanan keluarga, maupun kebutuhan menginap lainnya.') }}</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="https://api.whatsapp.com/send/?phone=6282145858851&text&type=phone_number&app_absent=0"><i class="fa-brands fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>{{ __('Navigasi Cepat') }}</h3>
+                    <ul>
+                        <li><a href="{{ url('/') }}">{{ __('Beranda') }}</a></li>
+                        <li><a href="{{ url('/pilihansewa') }}">{{ __('Pilihan Sewa') }}</a></li>
+                        <li><a href="{{ url('/galeri') }}">{{ __('Galeri') }}</a></li>
+                        <li><a href="{{ url('/tentangkami') }}">{{ __('Tentang Kami') }}</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>{{ __('Hubungi Kami') }}</h3>
+                    <p>{{ __('WhatsApp') }}</p>
+                    <p>{{ __('Facebook') }}</p>
                 </div>
             </div>
-            <div class="footer-links">
-                <h3>Navigasi Cepat</h3>
-                <ul>
-                    <li><a href="/">Beranda</a></li>
-                    <li><a href="pilihansewa">Pilihan Sewa</a></li>
-                    <li><a href="galeri">Galeri</a></li>
-                    <li><a href="tentangkami">Tentang Kami</a></li>
-                </ul>
-            </div>
-            <div class="footer-contact">
-                <h3>Hubungi Kami</h3>
-                <p>WhatsApp</p>
-                <p>Facebook</p>
-            </div>
+            <div class="copyright">&copy; {{ date('Y') }} Tulungagung & Batu Homestay. {{ __('Hak Cipta Dilindungi.') }}</div>
         </div>
-        <div class="copyright">&copy; <?= date('Y') ?> Tulungagung & Batu Homestay. Hak Cipta Dilindungi.</div>
     </footer>
 
     <script>
@@ -892,7 +949,7 @@ $userPhoto   = $currentUser['photo'] ?? null;
             requestAnimationFrame(() => pageOverlay.classList.add('hide'));
         });
 
-        // Sticky navbar: transparan di hero, solid setelah scroll melewati hero
+        // Sticky navbar
         const navWrap = document.getElementById('navWrap');
         const heroSection = document.getElementById('beranda-kontak');
         function updateNavOnScroll() {
@@ -905,7 +962,7 @@ $userPhoto   = $currentUser['photo'] ?? null;
         window.addEventListener('resize', updateNavOnScroll, { passive: true });
         updateNavOnScroll();
 
-        // Hamburger menu
+        // Hamburger
         const hamburger = document.getElementById('navHamburger');
         const navLinksMenu = document.getElementById('navLinks');
         const navOverlay = document.getElementById('navOverlay');
@@ -929,11 +986,15 @@ $userPhoto   = $currentUser['photo'] ?? null;
             window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
         }
 
-        // Handler navigasi + page transition
+        // Handler navigasi + page transition — KECUALIKAN lang-switch
         function handleNavLinkClick(e) {
             const link = e.currentTarget;
             const href = link.getAttribute('href');
             if (!href) return;
+
+            // Skip untuk link lang-switch
+            if (link.closest('.lang-switch')) return;
+
             closeMenu();
             if (href.startsWith('#')) {
                 e.preventDefault();
@@ -976,33 +1037,23 @@ $userPhoto   = $currentUser['photo'] ?? null;
             document.addEventListener('click', (e) => {
                 if (!searchForm.contains(e.target)) collapseSearch();
             });
-            searchForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-                const query = searchInput.value.trim();
-                if (query === '') return;
-                console.log('Mencari:', query);
-            });
         })();
 
-        // EN | ID language switch (UI only, siap dihubungkan ke sistem terjemahan)
-        const langSwitch = document.getElementById('langSwitch');
-        if (langSwitch) {
-            langSwitch.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    langSwitch.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    // TODO: hubungkan ke sistem terjemahan berdasarkan btn.dataset.lang
-                });
-            });
-        }
+        // EN | ID language switch — pakai route, tidak perlu JS
 
-        // Contact form
+        // Form submit — disable button & tampilkan loading
         const contactForm = document.getElementById('contactForm');
-        if (contactForm) {
+        const kirimBtn = document.getElementById('kirimBtn');
+        if (contactForm && kirimBtn) {
             contactForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-                alert('Terima kasih! Pesan kamu sudah kami terima.');
-                contactForm.reset();
+                // Form akan submit ke backend (POST /kontak)
+                // Cek validasi HTML5 dulu
+                if (!contactForm.checkValidity()) {
+                    return; // biarkan browser tampilkan pesan validasi
+                }
+                kirimBtn.disabled = true;
+                kirimBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> {{ __("Mengirim...") }}';
+                // Form submit normal ke /kontak
             });
         }
     </script>

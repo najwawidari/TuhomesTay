@@ -1,135 +1,14 @@
-<?php
-session_start();
-
-// =====================================================
-// KONFIGURASI DATABASE
-// =====================================================
-$db_host = 'localhost';
-$db_name = 'db_tuhomestay';
-$db_user = 'root';
-$db_pass = '';
-
-// =====================================================
-// KONEKSI + AUTO CREATE DATABASE & TABLE
-// =====================================================
-try {
-    $pdo = new PDO(
-        "mysql:host=$db_host;charset=utf8mb4",
-        $db_user,
-        $db_pass,
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-        ]
-    );
-
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$db_name` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    $pdo->exec("USE `$db_name`");
-
-    $pdo->exec("
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            fullname VARCHAR(100) NOT NULL,
-            email VARCHAR(150) NOT NULL UNIQUE,
-            phone VARCHAR(20) NOT NULL,
-            password VARCHAR(255) NOT NULL,
-            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    ");
-} catch (PDOException $e) {
-    die('Koneksi database gagal: ' . $e->getMessage());
-}
-
-// =====================================================
-// PATH GAMBAR BACKGROUND
-// =====================================================
-$bgImage = function_exists('asset')
-    ? asset('storage/properti/rumah_galeri.jpeg')
-    : '/storage/properti/rumah_galeri.jpeg';
-
-// =====================================================
-// PROSES REGISTRASI
-// =====================================================
-$errors = [];
-$old = [
-    'fullname' => '',
-    'email'    => '',
-    'phone'    => ''
-];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $fullname = trim($_POST['fullname'] ?? '');
-    $email    = trim($_POST['email'] ?? '');
-    $phone    = trim($_POST['phone'] ?? '');
-    $password = $_POST['password'] ?? '';
-    $confirm  = $_POST['confirm'] ?? '';
-
-    $old = compact('fullname', 'email', 'phone');
-
-    if ($fullname === '') {
-        $errors['fullname'] = 'Nama lengkap wajib diisi';
-    }
-
-    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors['email'] = 'Masukkan email yang valid';
-    }
-
-    if (strlen($phone) < 8) {
-        $errors['phone'] = 'Nomor telepon wajib diisi (minimal 8 digit)';
-    }
-
-    if (strlen($password) < 8) {
-        $errors['password'] = 'Kata sandi minimal 8 karakter';
-    }
-
-    if (isset($_POST['confirm']) && $password !== $confirm) {
-        $errors['confirm'] = 'Konfirmasi kata sandi tidak cocok';
-    }
-
-    if (empty($errors['email'])) {
-        $stmt = $pdo->prepare('SELECT id FROM users WHERE email = ? LIMIT 1');
-        $stmt->execute([$email]);
-        if ($stmt->fetch()) {
-            $errors['email'] = 'Email sudah terdaftar';
-        }
-    }
-
-    if (empty($errors)) {
-        $hash = password_hash($password, PASSWORD_DEFAULT);
-
-        $stmt = $pdo->prepare(
-            'INSERT INTO users (fullname, email, phone, password, created_at)
-             VALUES (?, ?, ?, ?, NOW())'
-        );
-        $stmt->execute([$fullname, $email, $phone, $hash]);
-
-        $_SESSION['user'] = [
-            'id'       => $pdo->lastInsertId(),
-            'fullname' => $fullname,
-            'email'    => $email,
-            'phone'    => $phone
-        ];
-
-        header('Location: /');
-        exit;
-    }
-}
-
-function fieldError($key, $errors) {
-    return isset($errors[$key]) ? $errors[$key] : '';
-}
-function hasError($key, $errors) {
-    return isset($errors[$key]) ? 'show-hint' : '';
-}
-function isInvalid($key, $errors) {
-    return isset($errors[$key]) ? 'invalid' : '';
-}
-?>
+@php
+    // $errors dan $old dikirim dari AuthController@showRegister
+    $errors = $errors ?? [];
+    $old    = $old ?? ['fullname' => '', 'email' => '', 'phone' => ''];
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Buat Akun - TuhomesTay</title>
 <style>
   :root{
@@ -180,7 +59,7 @@ function isInvalid($key, $errors) {
   .desktop-view::before{
     content:"";
     position:absolute; inset:0;
-    background-image:url('<?= $bgImage ?>');
+    background-image:url('{{ asset('storage/properti/rumah_galeri.jpeg') }}');
     background-size:cover;
     background-position:center;
     z-index:0;
@@ -204,7 +83,6 @@ function isInvalid($key, $errors) {
     box-shadow:0 10px 30px rgba(0,0,0,0.2);
   }
 
-  /* ===== LOGO DESKTOP (sudah diperbesar signifikan) ===== */
   .desktop-view .logo{
     display:flex;
     flex-direction:column;
@@ -259,7 +137,7 @@ function isInvalid($key, $errors) {
 
     .mobile-bg{
       position:absolute; inset:0;
-      background-image:url('<?= $bgImage ?>');
+      background-image:url('{{ asset('storage/properti/rumah_galeri.jpeg') }}');
       background-size:cover;
       background-position:center;
       z-index:0;
@@ -337,15 +215,9 @@ function isInvalid($key, $errors) {
     .switch-m{ text-align:center; margin-top:18px; font-size:13px; color:var(--brown-mid); }
     .switch-m a{ color:var(--brown-dark); font-weight:700; text-decoration:none; }
 
-    /* ===== LOGO MOBILE (sudah diperbesar) ===== */
-    .logo-bottom{
-      display:flex;
-      justify-content:center;
-    }
+    .logo-bottom{ display:flex; justify-content:center; }
     .logo-bottom img{
-      height:58px;
-      width:auto;
-      object-fit:contain;
+      height:58px; width:auto; object-fit:contain;
       filter:brightness(0) invert(1);
       opacity:0.92;
     }
@@ -364,42 +236,49 @@ function isInvalid($key, $errors) {
   <div class="desktop-view">
     <div class="card">
       <div class="logo">
-        <a href="/"><img src="image/logo.png" alt="TuhomesTay Logo"></a>
+        <a href="{{ url('/') }}"><img src="{{ asset('image/logo.png') }}" alt="TuhomesTay Logo"></a>
       </div>
 
       <h1>Buat Akun TuhomesTay</h1>
 
-      <form class="auth-form" method="POST" action="" novalidate>
+      <form class="auth-form" method="POST" action="{{ route('register.post') }}" novalidate>
         @csrf
-        <div class="field <?= hasError('fullname', $errors) ?>" data-field="fullname">
+        <div class="field @if(!empty($errors['fullname'])) show-hint @endif" data-field="fullname">
           <input type="text" name="fullname" placeholder="Nama lengkap"
-                 value="<?= htmlspecialchars($old['fullname']) ?>"
-                 class="<?= isInvalid('fullname', $errors) ?>"
+                 value="{{ old('fullname', $old['fullname'] ?? '') }}"
+                 class="@if(!empty($errors['fullname'])) invalid @endif"
                  autocomplete="name" required>
-          <label class="hint"><?= fieldError('fullname', $errors) ?: 'Nama lengkap wajib diisi' ?></label>
+          <label class="hint">{{ $errors['fullname'] ?? 'Nama lengkap wajib diisi' }}</label>
         </div>
 
-        <div class="field <?= hasError('email', $errors) ?>" data-field="email">
+        <div class="field @if(!empty($errors['email'])) show-hint @endif" data-field="email">
           <input type="email" name="email" placeholder="Email"
-                 value="<?= htmlspecialchars($old['email']) ?>"
-                 class="<?= isInvalid('email', $errors) ?>"
+                 value="{{ old('email', $old['email'] ?? '') }}"
+                 class="@if(!empty($errors['email'])) invalid @endif"
                  autocomplete="email" required>
-          <label class="hint"><?= fieldError('email', $errors) ?: 'Masukkan email yang valid' ?></label>
+          <label class="hint">{{ $errors['email'] ?? 'Masukkan email yang valid' }}</label>
         </div>
 
-        <div class="field <?= hasError('phone', $errors) ?>" data-field="phone">
+        <div class="field @if(!empty($errors['phone'])) show-hint @endif" data-field="phone">
           <input type="tel" name="phone" placeholder="Nomor telp"
-                 value="<?= htmlspecialchars($old['phone']) ?>"
-                 class="<?= isInvalid('phone', $errors) ?>"
+                 value="{{ old('phone', $old['phone'] ?? '') }}"
+                 class="@if(!empty($errors['phone'])) invalid @endif"
                  autocomplete="tel" required>
-          <label class="hint"><?= fieldError('phone', $errors) ?: 'Nomor telepon wajib diisi' ?></label>
+          <label class="hint">{{ $errors['phone'] ?? 'Nomor telepon wajib diisi' }}</label>
         </div>
 
-        <div class="field <?= hasError('password', $errors) ?>" data-field="password">
+        <div class="field @if(!empty($errors['password'])) show-hint @endif" data-field="password">
           <input type="password" name="password" placeholder="Kata sandi"
-                 class="<?= isInvalid('password', $errors) ?>"
+                 class="@if(!empty($errors['password'])) invalid @endif"
                  autocomplete="new-password" minlength="8" required>
-          <label class="hint"><?= fieldError('password', $errors) ?: 'Kata sandi minimal 8 karakter' ?></label>
+          <label class="hint">{{ $errors['password'] ?? 'Kata sandi minimal 8 karakter' }}</label>
+        </div>
+
+        <div class="field @if(!empty($errors['password_confirmation'])) show-hint @endif" data-field="password_confirmation">
+          <input type="password" name="password_confirmation" placeholder="Konfirmasi kata sandi"
+                 class="@if(!empty($errors['password_confirmation'])) invalid @endif"
+                 autocomplete="new-password" minlength="8" required>
+          <label class="hint">{{ $errors['password_confirmation'] ?? 'Konfirmasi kata sandi tidak cocok' }}</label>
         </div>
 
         <div class="submit-wrap">
@@ -421,7 +300,7 @@ function isInvalid($key, $errors) {
       </div>
 
       <div class="switch-link">
-        Sudah punya akun? <a href="/login">Masuk di sini</a>
+        Sudah punya akun? <a href="{{ route('login') }}">Masuk di sini</a>
       </div>
     </div>
   </div>
@@ -435,62 +314,62 @@ function isInvalid($key, $errors) {
         <h1>Buat Akun</h1>
         <p class="mobile-subtitle">Booking Homestay Impianmu</p>
 
-        <form class="auth-form" method="POST" action="" novalidate>
+        <form class="auth-form" method="POST" action="{{ route('register.post') }}" novalidate>
           @csrf
-          <div class="field-m <?= hasError('fullname', $errors) ?>" data-field="fullname">
+          <div class="field-m @if(!empty($errors['fullname'])) show-hint @endif" data-field="fullname">
             <span class="icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </span>
             <input type="text" name="fullname" placeholder="Nama lengkap"
-                   value="<?= htmlspecialchars($old['fullname']) ?>"
-                   class="<?= isInvalid('fullname', $errors) ?>"
+                   value="{{ old('fullname', $old['fullname'] ?? '') }}"
+                   class="@if(!empty($errors['fullname'])) invalid @endif"
                    autocomplete="name" required>
-            <p class="hint-m"><?= fieldError('fullname', $errors) ?: 'Nama lengkap wajib diisi' ?></p>
+            <p class="hint-m">{{ $errors['fullname'] ?? 'Nama lengkap wajib diisi' }}</p>
           </div>
 
-          <div class="field-m <?= hasError('email', $errors) ?>" data-field="email">
+          <div class="field-m @if(!empty($errors['email'])) show-hint @endif" data-field="email">
             <span class="icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
             </span>
             <input type="email" name="email" placeholder="exemple@gmail.com"
-                   value="<?= htmlspecialchars($old['email']) ?>"
-                   class="<?= isInvalid('email', $errors) ?>"
+                   value="{{ old('email', $old['email'] ?? '') }}"
+                   class="@if(!empty($errors['email'])) invalid @endif"
                    autocomplete="email" required>
-            <p class="hint-m"><?= fieldError('email', $errors) ?: 'Masukkan email yang valid' ?></p>
+            <p class="hint-m">{{ $errors['email'] ?? 'Masukkan email yang valid' }}</p>
           </div>
 
-          <div class="field-m <?= hasError('phone', $errors) ?>" data-field="phone">
+          <div class="field-m @if(!empty($errors['phone'])) show-hint @endif" data-field="phone">
             <span class="icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             </span>
             <input type="tel" name="phone" placeholder="Nomor telp"
-                   value="<?= htmlspecialchars($old['phone']) ?>"
-                   class="<?= isInvalid('phone', $errors) ?>"
+                   value="{{ old('phone', $old['phone'] ?? '') }}"
+                   class="@if(!empty($errors['phone'])) invalid @endif"
                    autocomplete="tel" required>
-            <p class="hint-m"><?= fieldError('phone', $errors) ?: 'Nomor telepon wajib diisi' ?></p>
+            <p class="hint-m">{{ $errors['phone'] ?? 'Nomor telepon wajib diisi' }}</p>
           </div>
 
-          <div class="field-m <?= hasError('password', $errors) ?>" data-field="password">
+          <div class="field-m @if(!empty($errors['password'])) show-hint @endif" data-field="password">
             <span class="icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </span>
             <input type="password" name="password" placeholder="Kata sandi"
-                   class="<?= isInvalid('password', $errors) ?>"
+                   class="@if(!empty($errors['password'])) invalid @endif"
                    autocomplete="new-password" minlength="8" required>
             <button type="button" class="toggle-eye" aria-label="Tampilkan kata sandi">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
-            <p class="hint-m"><?= fieldError('password', $errors) ?: 'Kata sandi minimal 8 karakter' ?></p>
+            <p class="hint-m">{{ $errors['password'] ?? 'Kata sandi minimal 8 karakter' }}</p>
           </div>
 
-          <div class="field-m <?= hasError('confirm', $errors) ?>" data-field="confirm">
+          <div class="field-m @if(!empty($errors['password_confirmation'])) show-hint @endif" data-field="password_confirmation">
             <span class="icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </span>
-            <input type="password" name="confirm" placeholder="Konfirmasi kata sandi"
-                   class="<?= isInvalid('confirm', $errors) ?>"
+            <input type="password" name="password_confirmation" placeholder="Konfirmasi kata sandi"
+                   class="@if(!empty($errors['password_confirmation'])) invalid @endif"
                    autocomplete="new-password" required>
-            <p class="hint-m"><?= fieldError('confirm', $errors) ?: 'Konfirmasi kata sandi tidak cocok' ?></p>
+            <p class="hint-m">{{ $errors['password_confirmation'] ?? 'Konfirmasi kata sandi tidak cocok' }}</p>
           </div>
 
           <button type="submit" class="submit-btn">Daftar</button>
@@ -509,11 +388,11 @@ function isInvalid($key, $errors) {
           </button>
         </div>
 
-        <p class="switch-m">Sudah punya akun? <a href="/login">Masuk di sini</a></p>
+        <p class="switch-m">Sudah punya akun? <a href="{{ route('login') }}">Masuk di sini</a></p>
       </div>
 
       <div class="logo-bottom">
-        <a href="/"><img src="image/logo.png" alt="TuhomesTay Logo"></a>
+        <a href="{{ url('/') }}"><img src="{{ asset('image/logo.png') }}" alt="TuhomesTay Logo"></a>
       </div>
     </div>
   </div>
@@ -527,6 +406,7 @@ function isInvalid($key, $errors) {
   });
 
   function invalidateField(field, invalid){
+    if (!field) return;
     field.classList.toggle('show-hint', invalid);
     const input = field.querySelector('input');
     if(input) input.classList.toggle('invalid', invalid);
@@ -543,13 +423,14 @@ function isInvalid($key, $errors) {
       form.querySelectorAll('[data-field]').forEach(field => {
         const type = field.dataset.field;
         const input = field.querySelector('input');
+        if (!input) return;
         let ok = true;
 
         if(type === 'fullname') ok = input.value.trim().length > 0;
         if(type === 'email') ok = validateEmail(input.value.trim());
         if(type === 'phone') ok = input.value.trim().length >= 8;
         if(type === 'password') ok = input.value.length >= 8;
-        if(type === 'confirm'){
+        if(type === 'password_confirmation'){
           const pass = form.querySelector('[data-field="password"] input');
           ok = pass && input.value.length > 0 && input.value === pass.value;
         }

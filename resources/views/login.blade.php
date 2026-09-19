@@ -1,21 +1,15 @@
-<?php
-// Variabel $errors dan $old sudah dikirim dari AuthController.
-// Fungsi bantu ini murni untuk keperluan tampilan.
-function fieldError($key, $errors) {
-    return isset($errors[$key]) ? $errors[$key] : '';
-}
-function hasError($key, $errors) {
-    return isset($errors[$key]) ? 'show-hint' : '';
-}
-function isInvalid($key, $errors) {
-    return isset($errors[$key]) ? 'invalid' : '';
-}
-?>
+@php
+    // $errors dan $old dikirim dari AuthController@showLogin
+    $errors = $errors ?? [];
+    $old    = $old ?? ['email' => '', 'phone' => ''];
+    $rememberEmail = request()->cookie('remember_email', '');
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Masuk - TuhomesTay</title>
 <style>
   :root{
@@ -73,7 +67,6 @@ function isInvalid($key, $errors) {
     box-shadow:0 10px 30px rgba(0,0,0,0.2);
   }
 
-  /* ===== LOGO DESKTOP (sudah diperbesar signifikan) ===== */
   .desktop-view .logo{
     display:flex;
     flex-direction:column;
@@ -120,7 +113,6 @@ function isInvalid($key, $errors) {
     font-size:13px; font-weight:600; text-align:center; margin-bottom:8px;
   }
 
-  /* Divider + social login */
   .desktop-view .divider{
     display:flex; align-items:center; gap:10px; margin:18px 0 14px;
     color:var(--brown-mid); font-size:12px;
@@ -251,21 +243,16 @@ function isInvalid($key, $errors) {
       width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
       padding:12px 0; border-radius:50px; border:1.5px solid var(--brown-dark);
       background:var(--input-bg); color:var(--brown-dark); font-size:13.5px; font-weight:600; cursor:pointer;
+      text-decoration:none;
     }
     .social-btn-m svg{ width:18px; height:18px; }
 
     .switch-m{ text-align:center; margin-top:18px; font-size:13px; color:var(--brown-mid); }
     .switch-m a{ color:var(--brown-dark); font-weight:700; text-decoration:none; }
 
-    /* ===== LOGO MOBILE (sudah diperbesar) ===== */
-    .logo-bottom{
-      display:flex;
-      justify-content:center;
-    }
+    .logo-bottom{ display:flex; justify-content:center; }
     .logo-bottom img{
-      height:58px;
-      width:auto;
-      object-fit:contain;
+      height:58px; width:auto; object-fit:contain;
       filter:brightness(0) invert(1);
       opacity:0.92;
     }
@@ -289,35 +276,35 @@ function isInvalid($key, $errors) {
   <div class="desktop-view">
     <div class="card">
       <div class="logo">
-        <a href="/"><img src="image/logo.png" alt="TuhomesTay Logo"></a>
+        <a href="{{ url('/') }}"><img src="{{ asset('image/logo.png') }}" alt="TuhomesTay Logo"></a>
       </div>
 
       <h1>Masuk ke TuhomesTay</h1>
       <p class="hint-text">Isi Kata Sandi atau Nomor Telepon Anda</p>
 
-      <?php if (isset($errors['general'])): ?>
-        <div class="error-box"><?= htmlspecialchars($errors['general']) ?></div>
-      <?php endif; ?>
+      @if(!empty($errors['general']))
+        <div class="error-box">{{ $errors['general'] }}</div>
+      @endif
 
-      <form class="auth-form" method="POST" action="{{ url('/login') }}" novalidate>
+      <form class="auth-form" method="POST" action="{{ route('login.post') }}" novalidate>
         @csrf
-        <div class="field" data-field="email">
+        <div class="field @if(!empty($errors['email'])) show-hint @endif" data-field="email">
           <input type="email" name="email" placeholder="Email"
-                 value="<?= htmlspecialchars($old['email'] ?: ($_COOKIE['remember_email'] ?? '')) ?>"
-                 class="<?= isInvalid('email', $errors) ?>"
+                 value="{{ old('email', $old['email'] ?: $rememberEmail) }}"
+                 class="@if(!empty($errors['email'])) invalid @endif"
                  autocomplete="email" required>
         </div>
 
-        <div class="field" data-field="password">
+        <div class="field @if(!empty($errors['password'])) show-hint @endif" data-field="password">
           <input type="password" name="password" placeholder="Kata sandi"
-                 class="<?= isInvalid('password', $errors) ?>"
+                 class="@if(!empty($errors['password'])) invalid @endif"
                  autocomplete="current-password">
         </div>
 
-        <div class="field" data-field="phone">
+        <div class="field @if(!empty($errors['phone'])) show-hint @endif" data-field="phone">
           <input type="tel" name="phone" placeholder="Nomor telepon"
-                 value="<?= htmlspecialchars($old['phone']) ?>"
-                 class="<?= isInvalid('phone', $errors) ?>"
+                 value="{{ old('phone', $old['phone'] ?? '') }}"
+                 class="@if(!empty($errors['phone'])) invalid @endif"
                  autocomplete="tel" inputmode="numeric">
         </div>
 
@@ -333,10 +320,10 @@ function isInvalid($key, $errors) {
       <div class="divider"><span>atau</span></div>
 
       <div class="social-buttons">
-        <button type="button" class="social-btn" id="googleLoginD">
+        <a href="{{ route('auth.google') }}" class="social-btn">
           <svg viewBox="0 0 20 20"><path fill="#4285F4" d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z"/><path fill="#34A853" d="M10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45c-.87.59-2.01.94-3.46.94-2.66 0-4.9-1.79-5.71-4.2H1.02v2.53C2.68 17.75 6.09 20 10 20z"/><path fill="#FBBC05" d="M4.29 11.87c-.2-.59-.31-1.22-.31-1.87s.11-1.28.31-1.87V5.6H1.02A9.97 9.97 0 0 0 0 10c0 1.61.39 3.14 1.02 4.4l3.27-2.53z"/><path fill="#EA4335" d="M10 3.96c1.47 0 2.79.5 3.83 1.49l2.87-2.87C14.95.99 12.7 0 10 0 6.09 0 2.68 2.25 1.02 5.6l3.27 2.53C5.1 5.75 7.34 3.96 10 3.96z"/></svg>
           Masuk dengan Google
-        </button>
+        </a>
         <button type="button" class="social-btn" id="facebookLoginD">
           <svg viewBox="0 0 24 24"><path fill="#1877F2" d="M22 12a10 10 0 1 0-11.5 9.95v-7.04H7.9V12h2.6V9.8c0-2.56 1.52-3.98 3.85-3.98 1.12 0 2.29.2 2.29.2v2.52h-1.29c-1.27 0-1.67.79-1.67 1.6V12h2.84l-.45 2.91h-2.39v7.04A10 10 0 0 0 22 12Z"/></svg>
           Masuk dengan Facebook
@@ -344,7 +331,7 @@ function isInvalid($key, $errors) {
       </div>
 
       <div class="switch-link">
-        Belum punya akun? <a href="/register">Daftar di sini</a>
+        Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a>
       </div>
     </div>
   </div>
@@ -358,50 +345,50 @@ function isInvalid($key, $errors) {
         <h1>Masuk</h1>
         <p class="mobile-subtitle">Booking Homestay Impianmu</p>
 
-        <?php if (isset($errors['general'])): ?>
-          <div class="error-box-m"><?= htmlspecialchars($errors['general']) ?></div>
-        <?php endif; ?>
+        @if(!empty($errors['general']))
+          <div class="error-box-m">{{ $errors['general'] }}</div>
+        @endif
 
-        <form class="auth-form" method="POST" action="{{ url('/login') }}" novalidate>
+        <form class="auth-form" method="POST" action="{{ route('login.post') }}" novalidate>
           @csrf
-          <div class="field-m <?= hasError('email', $errors) ?>" data-field="email">
+          <div class="field-m @if(!empty($errors['email'])) show-hint @endif" data-field="email">
             <span class="icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
             </span>
             <input type="email" name="email" placeholder="exemple@gmail.com"
-                   value="<?= htmlspecialchars($old['email'] ?: ($_COOKIE['remember_email'] ?? '')) ?>"
-                   class="<?= isInvalid('email', $errors) ?>"
+                   value="{{ old('email', $old['email'] ?: $rememberEmail) }}"
+                   class="@if(!empty($errors['email'])) invalid @endif"
                    autocomplete="email" required>
-            <p class="hint-m"><?= fieldError('email', $errors) ?: 'Masukkan email yang valid' ?></p>
+            <p class="hint-m">{{ $errors['email'] ?? 'Masukkan email yang valid' }}</p>
           </div>
 
-          <div class="field-m <?= hasError('password', $errors) ?>" data-field="password">
+          <div class="field-m @if(!empty($errors['password'])) show-hint @endif" data-field="password">
             <span class="icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </span>
             <input type="password" name="password" placeholder="Kata sandi"
-                   class="<?= isInvalid('password', $errors) ?>"
+                   class="@if(!empty($errors['password'])) invalid @endif"
                    autocomplete="current-password">
             <button type="button" class="toggle-eye" aria-label="Tampilkan kata sandi">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
-            <p class="hint-m"><?= fieldError('password', $errors) ?: 'Isi salah satu: kata sandi atau nomor telepon' ?></p>
+            <p class="hint-m">{{ $errors['password'] ?? 'Isi salah satu: kata sandi atau nomor telepon' }}</p>
           </div>
 
-          <div class="field-m <?= hasError('phone', $errors) ?>" data-field="phone">
+          <div class="field-m @if(!empty($errors['phone'])) show-hint @endif" data-field="phone">
             <span class="icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             </span>
             <input type="tel" name="phone" placeholder="Nomor telepon"
-                   value="<?= htmlspecialchars($old['phone']) ?>"
-                   class="<?= isInvalid('phone', $errors) ?>"
+                   value="{{ old('phone', $old['phone'] ?? '') }}"
+                   class="@if(!empty($errors['phone'])) invalid @endif"
                    autocomplete="tel" inputmode="numeric">
-            <p class="hint-m"><?= fieldError('phone', $errors) ?: 'Format nomor telepon tidak valid' ?></p>
+            <p class="hint-m">{{ $errors['phone'] ?? 'Format nomor telepon tidak valid' }}</p>
           </div>
 
           <div class="options-row">
             <label class="remember-check">
-              <input type="checkbox" name="remember" <?= isset($_COOKIE['remember_email']) ? 'checked' : '' ?>>
+              <input type="checkbox" name="remember" @if($rememberEmail) checked @endif>
               Ingat saya
             </label>
             <a href="#" class="forgot-m">Lupa Sandi?</a>
@@ -413,21 +400,21 @@ function isInvalid($key, $errors) {
         <div class="divider-m"><span>atau</span></div>
 
         <div class="social-buttons-m">
-          <button type="button" class="social-btn-m" id="googleLoginM">
+          <a href="{{ route('auth.google') }}" class="social-btn-m">
             <svg viewBox="0 0 20 20"><path fill="#4285F4" d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z"/><path fill="#34A853" d="M10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45c-.87.59-2.01.94-3.46.94-2.66 0-4.9-1.79-5.71-4.2H1.02v2.53C2.68 17.75 6.09 20 10 20z"/><path fill="#FBBC05" d="M4.29 11.87c-.2-.59-.31-1.22-.31-1.87s.11-1.28.31-1.87V5.6H1.02A9.97 9.97 0 0 0 0 10c0 1.61.39 3.14 1.02 4.4l3.27-2.53z"/><path fill="#EA4335" d="M10 3.96c1.47 0 2.79.5 3.83 1.49l2.87-2.87C14.95.99 12.7 0 10 0 6.09 0 2.68 2.25 1.02 5.6l3.27 2.53C5.1 5.75 7.34 3.96 10 3.96z"/></svg>
             Masuk dengan Google
-          </button>
+          </a>
           <button type="button" class="social-btn-m" id="facebookLoginM">
             <svg viewBox="0 0 24 24"><path fill="#1877F2" d="M22 12a10 10 0 1 0-11.5 9.95v-7.04H7.9V12h2.6V9.8c0-2.56 1.52-3.98 3.85-3.98 1.12 0 2.29.2 2.29.2v2.52h-1.29c-1.27 0-1.67.79-1.67 1.6V12h2.84l-.45 2.91h-2.39v7.04A10 10 0 0 0 22 12Z"/></svg>
             Masuk dengan Facebook
           </button>
         </div>
 
-        <p class="switch-m">Belum punya akun? <a href="/register">Daftar di sini</a></p>
+        <p class="switch-m">Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a></p>
       </div>
 
       <div class="logo-bottom">
-        <a href="/"><img src="image/logo.png" alt="TuhomesTay Logo"></a>
+        <a href="{{ url('/') }}"><img src="{{ asset('image/logo.png') }}" alt="TuhomesTay Logo"></a>
       </div>
     </div>
   </div>
@@ -441,6 +428,7 @@ function isInvalid($key, $errors) {
   });
 
   function invalidateField(field, invalid){
+    if (!field) return;
     field.classList.toggle('show-hint', invalid);
     const input = field.querySelector('input');
     if(input) input.classList.toggle('invalid', invalid);
@@ -462,16 +450,18 @@ function isInvalid($key, $errors) {
       const passwordField = form.querySelector('[data-field="password"]');
       const phoneField = form.querySelector('[data-field="phone"]');
 
-      const emailInput = emailField.querySelector('input');
-      const passwordInput = passwordField.querySelector('input');
-      const phoneInput = phoneField.querySelector('input');
+      const emailInput = emailField?.querySelector('input');
+      const passwordInput = passwordField?.querySelector('input');
+      const phoneInput = phoneField?.querySelector('input');
 
-      const emailOk = validateEmail(emailInput.value.trim());
-      invalidateField(emailField, !emailOk);
-      if(!emailOk) valid = false;
+      if (emailInput) {
+        const emailOk = validateEmail(emailInput.value.trim());
+        invalidateField(emailField, !emailOk);
+        if(!emailOk) valid = false;
+      }
 
-      const passwordFilled = passwordInput.value.trim().length > 0;
-      const phoneFilled = phoneInput.value.trim().length > 0;
+      const passwordFilled = passwordInput && passwordInput.value.trim().length > 0;
+      const phoneFilled = phoneInput && phoneInput.value.trim().length > 0;
 
       if(!passwordFilled && !phoneFilled){
         invalidateField(passwordField, true);
@@ -499,19 +489,6 @@ function isInvalid($key, $errors) {
         btn.textContent = 'memproses...';
       }
     });
-  });
-
-  document.getElementById('googleLoginM')?.addEventListener('click', () => {
-    alert('Hubungkan tombol ini dengan Google OAuth Anda.');
-  });
-  document.getElementById('facebookLoginM')?.addEventListener('click', () => {
-    alert('Hubungkan tombol ini dengan Facebook Login Anda.');
-  });
-  document.getElementById('googleLoginD')?.addEventListener('click', () => {
-    alert('Hubungkan tombol ini dengan Google OAuth Anda.');
-  });
-  document.getElementById('facebookLoginD')?.addEventListener('click', () => {
-    alert('Hubungkan tombol ini dengan Facebook Login Anda.');
   });
 </script>
 </body>

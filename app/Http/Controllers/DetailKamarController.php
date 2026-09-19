@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Properti;
-use Illuminate\Http\Request;
+use App\Models\Kamar;
 
 class DetailKamarController extends Controller
 {
     public function show($slug)
     {
-        $properti = Properti::where('slug', $slug)
-            ->orWhere('id', $slug)
-            ->where('is_active', true)
+        $kamar = Kamar::aktif()
+            ->where(function ($query) use ($slug) {
+                $query->where('slug', $slug)
+                      ->orWhere('id', $slug);
+            })
             ->firstOrFail();
 
-        return view('detailkamar', compact('properti'));
+        return view('detailkamar', compact('kamar'));
     }
 }

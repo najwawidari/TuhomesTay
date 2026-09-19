@@ -4,7 +4,7 @@
     $userPhoto   = $currentUser['photo'] ?? null;
 @endphp
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,7 +34,7 @@
         }
         #page-transition.hide { opacity: 0; }
 
-        /* ========== NAV (disamakan dengan halaman Beranda) ========== */
+        /* ========== NAV ========== */
         .nav-wrap {
             position: fixed; top: 0; left: 0; width: 100%;
             z-index: 500;
@@ -66,16 +66,20 @@
             flex-shrink: 0; user-select: none;
         }
         .nav-wrap.scrolled .lang-switch { color: #3B2A20; }
+        .lang-switch a,
         .lang-switch button {
             background: none; border: none; padding: 0; margin: 0;
             font: inherit; color: inherit; cursor: pointer;
             opacity: 0.6; transition: opacity 0.2s ease;
+            text-decoration: none;
         }
+        .lang-switch a.active,
         .lang-switch button.active { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
+        .lang-switch a:hover,
         .lang-switch button:hover { opacity: 1; }
         .lang-switch .lang-sep { opacity: 0.5; }
 
-        /* ===== SEARCH (icon -> expand) ===== */
+        /* ===== SEARCH ===== */
         .nav-search {
             display: flex; align-items: center; gap: 6px;
             background-color: transparent;
@@ -265,12 +269,8 @@
             display: flex; align-items: stretch; justify-content: center;
             gap: clamp(14px, 2vw, 22px); max-width: 1080px; width: 100%; margin: 0 auto;
         }
-        .punten-gallery .photo {
-            overflow: hidden; background: #D1B89A; flex-shrink: 0;
-        }
-        .punten-gallery .photo img {
-            width: 100%; height: 100%; object-fit: cover; display: block;
-        }
+        .punten-gallery .photo { overflow: hidden; background: #D1B89A; flex-shrink: 0; }
+        .punten-gallery .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .punten-gallery .photo.side {
             flex: 0 0 22%; max-width: 240px; height: clamp(180px, 22vw, 250px);
         }
@@ -422,20 +422,22 @@
                         <img src="{{ asset('image/logo.png') }}" alt="Tuhomestay Logo" class="logo-image"
                              onerror="this.src='https://placehold.co/120x50/F2E7D5/3B2A20?text=Tuhomestay'">
                     </li>
-                    <li><a href="{{ url('/') }}">Beranda</a></li>
-                    <li><a href="{{ url('/galeri') }}" class="active" aria-current="page">Galeri</a></li>
-                    <li><a href="{{ url('/pilihansewa') }}">Pilihan Sewa</a></li>
-                    <li><a href="{{ url('/tentangkami') }}">Tentang Kami</a></li>
+                    <li><a href="{{ url('/') }}">{{ __('Beranda') }}</a></li>
+                    <li><a href="{{ url('/galeri') }}" class="active" aria-current="page">{{ __('Galeri') }}</a></li>
+                    <li><a href="{{ url('/pilihansewa') }}">{{ __('Pilihan Sewa') }}</a></li>
+                    <li><a href="{{ url('/tentangkami') }}">{{ __('Tentang Kami') }}</a></li>
                 </ul>
                 <div class="nav-actions">
                     <div class="lang-switch" id="langSwitch" aria-label="Pilih bahasa">
-                        <button type="button" class="lang-btn" data-lang="en">EN</button>
+                        <a href="{{ route('lang.switch', 'en') }}"
+                           class="lang-btn {{ app()->getLocale() === 'en' ? 'active' : '' }}">EN</a>
                         <span class="lang-sep">|</span>
-                        <button type="button" class="lang-btn active" data-lang="id">ID</button>
+                        <a href="{{ route('lang.switch', 'id') }}"
+                           class="lang-btn {{ app()->getLocale() === 'id' ? 'active' : '' }}">ID</a>
                     </div>
 
-                    <form class="nav-search" id="navSearchForm" role="search">
-                        <input type="search" id="navSearchInput" placeholder="Pencarian..." aria-label="Cari" autocomplete="off">
+                    <form class="nav-search" id="navSearchForm" role="search" action="{{ url('/pilihansewa') }}" method="GET">
+                        <input type="search" id="navSearchInput" name="q" placeholder="{{ __('Pencarian...') }}" aria-label="Cari" autocomplete="off">
                         <button type="submit" class="nav-search-btn" id="navSearchBtn" aria-label="Cari"><i class="fa-solid fa-magnifying-glass"></i></button>
                     </form>
 
@@ -448,7 +450,7 @@
                             @endif
                         </a>
                     @else
-                        <a href="{{ url('/register') }}" class="nav-daftar-btn">Daftar | Masuk</a>
+                        <a href="{{ url('/register') }}" class="nav-daftar-btn">{{ __('Daftar | Masuk') }}</a>
                     @endif
 
                     <button type="button" class="nav-hamburger" id="navHamburger" aria-label="Buka menu">
@@ -460,12 +462,12 @@
 
         <img src="{{ asset('image/logo.png') }}" alt="Tuhomestay" class="galeri-hero-logo"
              onerror="this.src='https://placehold.co/160x60/00000000/ffffff?text=Tuhomestay'">
-        <h1>Intip <em>Kenyamanan</em> di Setiap<br>Sudut hunian <em>kami</em></h1>
+        <h1>{{ __('Intip') }} <em>{{ __('Kenyamanan') }}</em> {{ __('di Setiap') }}<br>{{ __('Sudut hunian') }} <em>{{ __('kami') }}</em></h1>
     </section>
 
     <section class="cabang-section" id="cabang">
-        <h2>Dua Cabang Penginapan</h2>
-        <p>Nikmati pengalaman menginap yang nyaman di dua cabang kami. Cabang Tulungagung menghadirkan suasana tenang dan asri di Jalan Pahlawan Gang II, Kedungwaru. Sementara cabang Batu, Malang menawarkan kesegaran udara pegunungan yang pas untuk relaksasi. Kedua lokasi siap memberikan kenyamanan terbaik untuk istirahat Anda.</p>
+        <h2>{{ __('Dua Cabang Penginapan') }}</h2>
+        <p>{{ __('Nikmati pengalaman menginap yang nyaman di dua cabang kami. Cabang Tulungagung menghadirkan suasana tenang dan asri di Jalan Pahlawan Gang II, Kedungwaru. Sementara cabang Batu, Malang menawarkan kesegaran udara pegunungan yang pas untuk relaksasi. Kedua lokasi siap memberikan kenyamanan terbaik untuk istirahat Anda.') }}</p>
         <div class="cabang-divider">
             <div class="hline"></div>
             <div class="vline-wrap"></div>
@@ -474,7 +476,7 @@
     </section>
 
     <section class="punten-section" id="punten-batu">
-        <h2>Punten <em>Batu-Malang</em></h2>
+        <h2>{{ __('Punten') }} <em>{{ __('Batu-Malang') }}</em></h2>
         <div class="punten-gallery">
             <div class="photo side">
                 <img src="{{ asset('storage/properti/detailkamar_batu.jpg') }}" alt="Halaman Punten"
@@ -490,11 +492,11 @@
             </div>
         </div>
         <div class="punten-caption-line"></div>
-        <p class="punten-caption">Nikmati kenyamanan tinggal di cabang Batu, Malang kami yang berlokasi di area Punten — sejuk, tenang, dan dekat destinasi wisata.</p>
+        <p class="punten-caption">{{ __('Nikmati kenyamanan tinggal di cabang Batu, Malang kami yang berlokasi di area Punten — sejuk, tenang, dan dekat destinasi wisata.') }}</p>
     </section>
 
     <section class="tulungagung-section" id="tulungagung">
-        <h2>Tulungagung Penginapan</h2>
+        <h2>{{ __('Tulungagung Penginapan') }}</h2>
         <div class="tulungagung-grid">
             <div class="photo">
                 <img src="{{ asset('storage/properti/dapurkamarmandi_tulungagung.jpg') }}" alt="Ruang dapur"
@@ -513,13 +515,13 @@
                      onerror="this.src='https://placehold.co/400x420/E7D9C2/3B2A22?text=Depan'">
             </div>
         </div>
-        <p class="tulungagung-caption">Nikmati kenyamanan tinggal di cabang Tulungagung kami yang berlokasi di Jalan Pahlawan Gang II, Rejoagung, Kedungwaru.</p>
+        <p class="tulungagung-caption">{{ __('Nikmati kenyamanan tinggal di cabang Tulungagung kami yang berlokasi di Jalan Pahlawan Gang II, Rejoagung, Kedungwaru.') }}</p>
     </section>
 
     <footer>
         <div class="footer-container">
             <div class="footer-about">
-                <p>Tulungagung &amp; Batu Homestay menyediakan tempat menginap yang nyaman dan tenang untuk menemani perjalananmu. Temukan pilihan akomodasi yang cocok untuk perjalanan keluarga, maupun kebutuhan menginap lainnya.</p>
+                <p>{{ __('Tulungagung & Batu Homestay menyediakan tempat menginap yang nyaman dan tenang untuk menemani perjalananmu. Temukan pilihan akomodasi yang cocok untuk perjalanan keluarga, maupun kebutuhan menginap lainnya.') }}</p>
                 <div class="social-links">
                     <a href="#"><i class="fa-brands fa-instagram"></i></a>
                     <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
@@ -527,21 +529,21 @@
                 </div>
             </div>
             <div class="footer-links">
-                <h3>Navigasi Cepat</h3>
+                <h3>{{ __('Navigasi Cepat') }}</h3>
                 <ul>
-                    <li><a href="{{ url('/') }}">Beranda</a></li>
-                    <li><a href="{{ url('/pilihansewa') }}">Pilihan Sewa</a></li>
-                    <li><a href="{{ url('/galeri') }}">Galeri</a></li>
-                    <li><a href="{{ url('/tentangkami') }}">Tentang Kami</a></li>
+                    <li><a href="{{ url('/') }}">{{ __('Beranda') }}</a></li>
+                    <li><a href="{{ url('/pilihansewa') }}">{{ __('Pilihan Sewa') }}</a></li>
+                    <li><a href="{{ url('/galeri') }}">{{ __('Galeri') }}</a></li>
+                    <li><a href="{{ url('/tentangkami') }}">{{ __('Tentang Kami') }}</a></li>
                 </ul>
             </div>
             <div class="footer-contact">
-                <h3>Hubungi Kami</h3>
-                <p>WhatsApp</p>
-                <p>Facebook</p>
+                <h3>{{ __('Hubungi Kami') }}</h3>
+                <p>{{ __('WhatsApp') }}</p>
+                <p>{{ __('Facebook') }}</p>
             </div>
         </div>
-        <div class="copyright">&copy; {{ date('Y') }} Tulungagung &amp; Batu Homestay. Hak Cipta Dilindungi.</div>
+        <div class="copyright">&copy; {{ date('Y') }} Tulungagung &amp; Batu Homestay. {{ __('Hak Cipta Dilindungi.') }}</div>
     </footer>
 
     <script>
@@ -609,17 +611,12 @@
             if (navSearchForm && !navSearchForm.contains(e.target)) collapseSearch();
         });
 
-        // ===== EN | ID language switch (UI only, siap dihubungkan ke sistem terjemahan) =====
-        const langSwitch = document.getElementById('langSwitch');
-        langSwitch?.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                langSwitch.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                // TODO: hubungkan ke sistem terjemahan (mis. Laravel Localization) berdasarkan btn.dataset.lang
-            });
-        });
+        // ===== EN | ID language switch — pakai route, tidak perlu JS =====
 
+        // Page transition — KECUALIKAN link lang-switch
         document.querySelectorAll('a[href]').forEach(link => {
+            if (link.closest('.lang-switch')) return;
+
             link.addEventListener('click', function (e) {
                 const href = this.getAttribute('href');
                 if (!href || href.startsWith('#') || this.target === '_blank' || /^(https?:|mailto:|tel:)/.test(href)) {

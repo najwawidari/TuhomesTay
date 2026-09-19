@@ -4,7 +4,7 @@
     $userPhoto   = $currentUser['photo'] ?? null;
 @endphp
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -83,16 +83,20 @@
             flex-shrink: 0; user-select: none;
         }
         .nav-wrap.scrolled .lang-switch { color: #3B2A20; }
+        .lang-switch a,
         .lang-switch button {
             background: none; border: none; padding: 0; margin: 0;
             font: inherit; color: inherit; cursor: pointer;
             opacity: 0.6; transition: opacity 0.2s ease;
+            text-decoration: none;
         }
+        .lang-switch a.active,
         .lang-switch button.active { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
+        .lang-switch a:hover,
         .lang-switch button:hover { opacity: 1; }
         .lang-switch .lang-sep { opacity: 0.5; }
 
-        /* ===== SEARCH (icon -> expand) ===== */
+        /* ===== SEARCH ===== */
         .nav-search {
             display: flex; align-items: center; gap: 6px;
             background-color: transparent;
@@ -394,16 +398,19 @@
             align-items: center; text-align: center; position: relative;
         }
         .branch-logo {
-            width: 75px; height: 75px; object-fit: contain; margin-bottom: 20px;
-            border-radius: 50%; background: rgba(255,255,255,0.15); padding: 8px;
+            width: 115px; height: 115px; object-fit: contain; margin-bottom: 10px;
+            border-radius: 0; background: transparent; padding: 0;
+            display: block;
         }
         .branches-section h2 {
             font-family: 'Poppins', sans-serif; font-weight: 600;
             font-size: clamp(1.5rem, 2.8vw, 2.1rem); color: #FAF7F0; margin-bottom: 8px;
+            margin-top: 0;
         }
         .branches-section > p {
             font-family: 'Poppins', sans-serif; font-size: 0.9rem;
             color: rgba(250,247,240,0.8); margin-bottom: 28px;
+            margin-top: 0;
         }
         .branch-buttons {
             display: flex; flex-direction: column; gap: 14px;
@@ -430,8 +437,21 @@
         /* ===== TESTIMONIAL ===== */
         .testimonial-section {
             background: #F2E7D5;
-            padding: clamp(60px, 8vw, 100px) 20px;
+            padding: clamp(72px, 9vw, 110px) 20px clamp(60px, 8vw, 100px);
             text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .testimonial-section::before {
+            content: '';
+            position: absolute;
+            top: calc(-1 * clamp(28px, 4vw, 52px));
+            left: 0;
+            width: 100%;
+            height: clamp(28px, 4vw, 52px);
+            background-color: #F2E7D5;
+            clip-path: ellipse(120% 100% at 50% 100%);
+            pointer-events: none;
         }
         .testimonial-section h2 {
             font-family: 'Poppins', sans-serif;
@@ -511,18 +531,28 @@
             background: #7B5E4A;
         }
 
-        /* ===== STEPS — lengkung ATAS ke dalam, ikon besar dengan hover-lift ===== */
+        /* ===== STEPS ===== */
         .steps-section {
             background-color: #D1B89A;
-            padding: clamp(80px, 10vw, 120px) 20px clamp(56px, 8vw, 100px);
+            padding: clamp(88px, 11vw, 130px) 20px clamp(56px, 8vw, 100px);
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             position: relative;
             z-index: 2;
-            border-radius: 50% 50% 0 0 / clamp(48px, 7vw, 100px) clamp(48px, 7vw, 100px) 0 0;
-            margin-top: calc(-1 * clamp(36px, 5vw, 70px));
+            margin-top: 0;
+        }
+        .steps-section::before {
+            content: '';
+            position: absolute;
+            top: calc(-1 * clamp(28px, 4vw, 52px));
+            left: 0;
+            width: 100%;
+            height: clamp(28px, 4vw, 52px);
+            background-color: #D1B89A;
+            clip-path: ellipse(120% 100% at 50% 100%);
+            pointer-events: none;
         }
         .steps-eyebrow {
             font-family: 'Poppins', sans-serif;
@@ -652,7 +682,6 @@
             padding-top: 14px; font-size: 0.78rem; color: #F2E7D5; opacity: 0.7;
         }
 
-        /* Responsive */
         @media (max-width: 992px) {
             .steps-track::before { display: none; }
             .footer-container { flex-direction: column; gap: 28px; }
@@ -704,21 +733,21 @@
         <div class="hero-slider">
             <div class="hero-slide active"
                  style="background-image: url('{{ asset('storage/properti/gambar_depan_tulungagung.jpg') }}'), url('https://placehold.co/1600x900/3B2A20/ffffff?text=Homestay');"
-                 data-title="Belum Punya Akun?<br><em>Daftar</em> Dulu Yuk!"
-                 data-desc="Daftar gratis dan booking homestay, villa, & kost di Tulungagung dan Batu jadi lebih mudah. Ada penawaran spesial khusus member!"
-                 data-cta="Daftar Sekarang"
+                 data-title="{{ __('Belum Punya Akun?') }}<br><em>{{ __('Daftar Dulu Yuk!') }}</em>"
+                 data-desc="{{ __('Daftar gratis dan booking homestay, villa, & kost di Tulungagung dan Batu jadi lebih mudah. Ada penawaran spesial khusus member!') }}"
+                 data-cta="{{ __('Daftar Sekarang') }}"
                  data-href="{{ url('/register') }}"></div>
             <div class="hero-slide"
                  style="background-image: url('{{ asset('storage/properti/gambar_ruangtamu_belakang.jpg') }}'), url('https://placehold.co/1600x900/3B2A20/ffffff?text=Kost+Nyaman');"
-                 data-title="Kost <em>Nyaman</em>,<br>Harga Bersahabat."
-                 data-desc="Fasilitas lengkap, lokasi strategis dekat kampus dan pusat kota, cocok untuk kebutuhan jangka panjangmu."
-                 data-cta="Cek Galeri TuhomesTay"
+                 data-title="{{ __('Kost Nyaman,') }}<br>{{ __('Harga Bersahabat.') }}"
+                 data-desc="{{ __('Fasilitas lengkap, lokasi strategis dekat kampus dan pusat kota, cocok untuk kebutuhan jangka panjangmu.') }}"
+                 data-cta="{{ __('Cek Galeri TuhomesTay') }}"
                  data-href="{{ url('/galeri') }}"></div>
             <div class="hero-slide"
                  style="background-image: url('{{ asset('storage/properti/rumah_galeri.jpeg') }}'), url('https://placehold.co/1600x900/3B2A20/ffffff?text=Villa+Batu');"
-                 data-title="Rasakan <em>Sejuknya</em><br>Udara Batu."
-                 data-desc="Villa asri dengan pemandangan pegunungan, cocok untuk liburan keluarga maupun healing bareng teman."
-                 data-cta="Lihat Pilihan Sewa"
+                 data-title="{{ __('Rasakan Sejuknya') }}<br>{{ __('Udara Batu.') }}"
+                 data-desc="{{ __('Villa asri dengan pemandangan pegunungan, cocok untuk liburan keluarga maupun healing bareng teman.') }}"
+                 data-cta="{{ __('Lihat Pilihan Sewa') }}"
                  data-href="{{ url('/pilihansewa') }}"></div>
         </div>
         <div class="hero-overlay"></div>
@@ -734,20 +763,22 @@
                         <img src="{{ asset('image/logo.png') }}" alt="Tuhomestay Logo" class="logo-image"
                              onerror="this.src='https://placehold.co/120x50/F2E7D5/3B2A20?text=Tuhomestay'">
                     </li>
-                    <li><a href="{{ url('/') }}" class="active" aria-current="page">Beranda</a></li>
-                    <li><a href="{{ url('/galeri') }}">Galeri</a></li>
-                    <li><a href="{{ url('/pilihansewa') }}">Pilihan Sewa</a></li>
-                    <li><a href="{{ url('/tentangkami') }}">Tentang Kami</a></li>
+                    <li><a href="{{ url('/') }}" class="active" aria-current="page">{{ __('Beranda') }}</a></li>
+                    <li><a href="{{ url('/galeri') }}">{{ __('Galeri') }}</a></li>
+                    <li><a href="{{ url('/pilihansewa') }}">{{ __('Pilihan Sewa') }}</a></li>
+                    <li><a href="{{ url('/tentangkami') }}">{{ __('Tentang Kami') }}</a></li>
                 </ul>
                 <div class="nav-actions">
                     <div class="lang-switch" id="langSwitch" aria-label="Pilih bahasa">
-                        <button type="button" class="lang-btn" data-lang="en">EN</button>
+                        <a href="{{ route('lang.switch', 'en') }}"
+                           class="lang-btn {{ app()->getLocale() === 'en' ? 'active' : '' }}">EN</a>
                         <span class="lang-sep">|</span>
-                        <button type="button" class="lang-btn active" data-lang="id">ID</button>
+                        <a href="{{ route('lang.switch', 'id') }}"
+                           class="lang-btn {{ app()->getLocale() === 'id' ? 'active' : '' }}">ID</a>
                     </div>
 
-                    <form class="nav-search" id="navSearchForm" role="search">
-                        <input type="search" id="navSearchInput" placeholder="Pencarian..." aria-label="Cari" autocomplete="off">
+                    <form class="nav-search" id="navSearchForm" role="search" action="{{ url('/pilihansewa') }}" method="GET">
+                        <input type="search" id="navSearchInput" name="q" placeholder="{{ __('Pencarian...') }}" aria-label="Cari" autocomplete="off">
                         <button type="submit" class="nav-search-btn" id="navSearchBtn" aria-label="Cari"><i class="fa-solid fa-magnifying-glass"></i></button>
                     </form>
 
@@ -760,7 +791,7 @@
                             @endif
                         </a>
                     @else
-                        <a href="{{ url('/register') }}" class="nav-daftar-btn">Daftar | Masuk</a>
+                        <a href="{{ url('/register') }}" class="nav-daftar-btn">{{ __('Daftar | Masuk') }}</a>
                     @endif
 
                     <button type="button" class="nav-hamburger" id="navHamburger" aria-label="Buka menu">
@@ -772,10 +803,10 @@
 
         <div class="hero-content">
             <div class="hero-text-group" id="heroTextGroup">
-                <h1 id="heroTitle">Belum Punya Akun?<br><em>Daftar</em> Dulu Yuk!</h1>
-                <p id="heroDesc">Daftar gratis dan booking homestay, villa, & kost di Tulungagung dan Batu jadi lebih mudah. Ada penawaran spesial khusus member!</p>
+                <h1 id="heroTitle">{{ __('Belum Punya Akun?') }}<br><em>{{ __('Daftar Dulu Yuk!') }}</em></h1>
+                <p id="heroDesc">{{ __('Daftar gratis dan booking homestay, villa, & kost di Tulungagung dan Batu jadi lebih mudah. Ada penawaran spesial khusus member!') }}</p>
                 <a href="{{ url('/register') }}" class="hero-cta" id="heroCta">
-                    <span id="heroCtaText">Daftar Sekarang</span>
+                    <span id="heroCtaText">{{ __('Daftar Sekarang') }}</span>
                     <span class="cta-icon"><i class="fa-solid fa-arrow-right"></i></span>
                 </a>
             </div>
@@ -789,9 +820,9 @@
     <section class="whatsapp-section" id="pilihan-kamar">
         <div class="whatsapp-inner">
             <div class="whatsapp-text">
-                <span class="whatsapp-eyebrow">Konsultasi Cepat</span>
-                <h2>Punya pertanyaan seputar fasilitas atau ingin lihat langsung?</h2>
-                <p class="whatsapp-desc">Kami siap bantu, kapan saja kamu butuh. Jadwalkan survei lokasi atau tanyakan detail kamar lewat WhatsApp.</p>
+                <span class="whatsapp-eyebrow">{{ __('Konsultasi Cepat') }}</span>
+                <h2>{{ __('Punya pertanyaan seputar fasilitas atau ingin lihat langsung?') }}</h2>
+                <p class="whatsapp-desc">{{ __('Kami siap bantu, kapan saja kamu butuh. Jadwalkan survei lokasi atau tanyakan detail kamar lewat WhatsApp.') }}</p>
             </div>
             <div class="whatsapp-visual">
                 <div class="mockup-container">
@@ -802,7 +833,7 @@
                 <div class="whatsapp-btn-wrap">
                     <a href="https://api.whatsapp.com/send/?phone=6282145858851&text&type=phone_number&app_absent=0"
                        target="_blank" class="whatsapp-btn">
-                        Jadwalkan Survei Lokasi
+                        {{ __('Jadwalkan Survei Lokasi') }}
                         <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></i>
                     </a>
                 </div>
@@ -814,23 +845,23 @@
         <iframe src="https://www.google.com/maps?q=Bee+Laundry,+Jalan+Pahlawan+Gang+II,+Rejoagung,+Kedungwaru,+Tulungagung&output=embed&z=15"
                 allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Lokasi Homestay"></iframe>
         <div class="map-overlay-content">
-            <h2>Lokasi <em>Utama</em><br>Homestay Kost dan Villa</h2>
+            <h2>{{ __('Lokasi Utama') }}<br>{{ __('Homestay Kost dan Villa') }}</h2>
             <p>Bee Laundry, Jalan Pahlawan Gang II, RT.4/RW.2, Rejoagung, Kedungwaru, Kab. Tulungagung</p>
             <a href="https://www.google.com/maps/search/?api=1&query=Bee+Laundry,+Jalan+Pahlawan+Gang+II,+RT.4/RW.2,+Rejoagung,+Kedungwaru,+Kab.+Tulungagung"
-               target="_blank" class="map-cta">Check Lokasi</a>
+               target="_blank" class="map-cta">{{ __('Check Lokasi') }}</a>
         </div>
     </section>
 
     <section class="branches-section" id="kontak-lokasi">
         <img src="{{ asset('image/logo.png') }}" alt="Logo" class="branch-logo"
              onerror="this.src='https://placehold.co/75x75/7B5E4A/ffffff?text=MH'">
-        <h2>Alamat Cabang</h2>
-        <p>Pilih Cabang untuk melihat Google Maps</p>
+        <h2>{{ __('Alamat Cabang') }}</h2>
+        <p>{{ __('Pilih Cabang untuk melihat Google Maps') }}</p>
         <div class="branch-buttons">
             <a href="https://maps.google.com/?q=Batu,Punten,Malang" target="_blank" class="branch-btn">
                 <div>
                     <span class="branch-icon"><i class="fa-solid fa-location-dot"></i></span>
-                    <span>Malang (Batu, Punten)</span>
+                    <span>{{ __('Malang (Batu, Punten)') }}</span>
                 </div>
                 <i class="fa-solid fa-chevron-right"></i>
             </a>
@@ -838,7 +869,7 @@
                target="_blank" class="branch-btn">
                 <div>
                     <span class="branch-icon"><i class="fa-solid fa-location-dot"></i></span>
-                    <span>Tulungagung (Rejoagung)</span>
+                    <span>{{ __('Tulungagung (Rejoagung)') }}</span>
                 </div>
                 <i class="fa-solid fa-chevron-right"></i>
             </a>
@@ -847,7 +878,7 @@
 
     {{-- TESTIMONIAL --}}
     <section class="testimonial-section">
-        <h2>Apa Yang Orang Bilang</h2>
+        <h2>{{ __('Apa Yang Orang Bilang') }}</h2>
         <div class="testimonial-single">
             <i class="fa-solid fa-quote-right testimonial-quote-icon"></i>
             <div class="testimonial-track-wrap" id="testiTrackWrap">
@@ -858,28 +889,28 @@
     </section>
 
     <section class="steps-section" id="tahapan">
-        <p class="steps-eyebrow">Bingung cara menggunakan website kami?</p>
-        <h2>Tahapan menggunakan TuhomesTay</h2>
+        <p class="steps-eyebrow">{{ __('Bingung cara menggunakan website kami?') }}</p>
+        <h2>{{ __('Tahapan menggunakan TuhomesTay') }}</h2>
         <div class="steps-track">
             <div class="step-item">
                 <div class="step-icon"><i class="fa-solid fa-bed"></i></div>
-                <h3>Pilih Cabang & Kost</h3>
-                <p>Pilih Cabang sesuai tujuan Anda & pilih kost atau villa yang diinginkan. Sesuaikan juga dengan filter yang disediakan.</p>
+                <h3>{{ __('Pilih Cabang & Kost') }}</h3>
+                <p>{{ __('Pilih Cabang sesuai tujuan Anda & pilih kost atau villa yang diinginkan. Sesuaikan juga dengan filter yang disediakan.') }}</p>
             </div>
             <div class="step-item">
                 <div class="step-icon"><i class="fa-solid fa-calendar-check"></i></div>
-                <h3>Booking & Bayar</h3>
-                <p>Isi biodata yang sudah disediakan saat booking & lakukan pembayaran.</p>
+                <h3>{{ __('Booking & Bayar') }}</h3>
+                <p>{{ __('Isi biodata yang sudah disediakan saat booking & lakukan pembayaran.') }}</p>
             </div>
             <div class="step-item">
                 <div class="step-icon"><i class="fa-solid fa-house"></i></div>
-                <h3>Check In</h3>
-                <p>Datang ke lokasi yang sudah di booking & check in dengan menunjukkan invoice atau pemesanan kepada admin.</p>
+                <h3>{{ __('Check In') }}</h3>
+                <p>{{ __('Datang ke lokasi yang sudah di booking & check in dengan menunjukkan invoice atau pemesanan kepada admin.') }}</p>
             </div>
             <div class="step-item">
                 <div class="step-icon"><i class="fa-solid fa-heart"></i></div>
-                <h3>Nikmati Layanan</h3>
-                <p>Nikmati jasa layanan dari admin atau pemilik kost dan layanan lainnya (kebersihan kost & villa).</p>
+                <h3>{{ __('Nikmati Layanan') }}</h3>
+                <p>{{ __('Nikmati jasa layanan dari admin atau pemilik kost dan layanan lainnya (kebersihan kost & villa).') }}</p>
             </div>
         </div>
     </section>
@@ -887,7 +918,7 @@
     <footer>
         <div class="footer-container">
             <div class="footer-about">
-                <p>Tulungagung & Batu Homestay menyediakan tempat menginap yang nyaman dan tenang untuk menemani perjalananmu. Temukan pilihan akomodasi yang cocok untuk perjalanan keluarga, maupun kebutuhan menginap lainnya.</p>
+                <p>{{ __('Tulungagung & Batu Homestay menyediakan tempat menginap yang nyaman dan tenang untuk menemani perjalananmu. Temukan pilihan akomodasi yang cocok untuk perjalanan keluarga, maupun kebutuhan menginap lainnya.') }}</p>
                 <div class="social-links">
                     <a href="#"><i class="fa-brands fa-instagram"></i></a>
                     <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
@@ -895,21 +926,21 @@
                 </div>
             </div>
             <div class="footer-links">
-                <h3>Navigasi Cepat</h3>
+                <h3>{{ __('Navigasi Cepat') }}</h3>
                 <ul>
-                    <li><a href="{{ url('/') }}">Beranda</a></li>
-                    <li><a href="{{ url('/pilihansewa') }}">Pilihan Sewa</a></li>
-                    <li><a href="{{ url('/galeri') }}">Galeri</a></li>
-                    <li><a href="{{ url('/tentangkami') }}">Tentang Kami</a></li>
+                    <li><a href="{{ url('/') }}">{{ __('Beranda') }}</a></li>
+                    <li><a href="{{ url('/pilihansewa') }}">{{ __('Pilihan Sewa') }}</a></li>
+                    <li><a href="{{ url('/galeri') }}">{{ __('Galeri') }}</a></li>
+                    <li><a href="{{ url('/tentangkami') }}">{{ __('Tentang Kami') }}</a></li>
                 </ul>
             </div>
             <div class="footer-contact">
-                <h3>Hubungi Kami</h3>
-                <p>WhatsApp</p>
-                <p>Facebook</p>
+                <h3>{{ __('Hubungi Kami') }}</h3>
+                <p>{{ __('WhatsApp') }}</p>
+                <p>{{ __('Facebook') }}</p>
             </div>
         </div>
-        <div class="copyright">&copy; {{ date('Y') }} Tulungagung & Batu Homestay. Hak Cipta Dilindungi.</div>
+        <div class="copyright">&copy; {{ date('Y') }} Tulungagung & Batu Homestay. {{ __('Hak Cipta Dilindungi.') }}</div>
     </footer>
 
     <script>
@@ -1030,17 +1061,12 @@
             if (navSearchForm && !navSearchForm.contains(e.target)) collapseSearch();
         });
 
-        // ===== EN | ID language switch (UI only, siap dihubungkan ke sistem terjemahan) =====
-        const langSwitch = document.getElementById('langSwitch');
-        langSwitch?.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                langSwitch.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                // TODO: hubungkan ke sistem terjemahan (mis. Laravel Localization) berdasarkan btn.dataset.lang
-            });
-        });
+        // ===== EN | ID language switch — pakai route, tidak perlu JS =====
 
+        // Page transition — KECUALIKAN link lang-switch
         document.querySelectorAll('a[href]').forEach(link => {
+            if (link.closest('.lang-switch')) return;
+
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
                 if (!href || href.startsWith('#') || this.target === '_blank' || /^(https?:|mailto:|tel:)/.test(href)) {
@@ -1054,9 +1080,21 @@
         });
 
         const testimonials = [
-            { name: "Najwa Roro Widari", role: "Customer", quote: "Kalau ada orang yang bilang tempat ini kemahalan, gila si... soalnya dari segi harga dari segi kenyamanan semua itu ada lhoo. Enak deh pokoknya tidur disini gak bakal kapok." },
-            { name: "Ahmad Fauzi", role: "Customer", quote: "Tempatnya bersih, aman, dan pemiliknya ramah banget. Fasilitas lengkap, cocok buat yang butuh tempat tinggal nyaman di area kampus. Recommended pokoknya!" },
-            { name: "Siti Aminah", role: "Customer", quote: "Sewa fleksibelnya bikin gampang banget. Tinggal sesuai kebutuhan, harganya bersahabat, dan lokasinya strategis. Bakal balik lagi kalau ke Batu." }
+            {
+                name: "Najwa Roro Widari",
+                role: "{{ __('Customer') }}",
+                quote: "{{ __('Kalau ada orang yang bilang tempat ini kemahalan, gila si... soalnya dari segi harga dari segi kenyamanan semua itu ada lhoo. Enak deh pokoknya tidur disini gak bakal kapok.') }}"
+            },
+            {
+                name: "Ahmad Fauzi",
+                role: "{{ __('Customer') }}",
+                quote: "{{ __('Tempatnya bersih, aman, dan pemiliknya ramah banget. Fasilitas lengkap, cocok buat yang butuh tempat tinggal nyaman di area kampus. Recommended pokoknya!') }}"
+            },
+            {
+                name: "Siti Aminah",
+                role: "{{ __('Customer') }}",
+                quote: "{{ __('Sewa fleksibelnya bikin gampang banget. Tinggal sesuai kebutuhan, harganya bersahabat, dan lokasinya strategis. Bakal balik lagi kalau ke Batu.') }}"
+            }
         ];
         const testiTrack = document.getElementById('testiTrack');
         const testiTrackWrap = document.getElementById('testiTrackWrap');

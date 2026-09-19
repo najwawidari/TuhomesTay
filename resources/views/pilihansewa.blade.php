@@ -4,7 +4,7 @@
     $userPhoto   = $currentUser['photo'] ?? null;
 @endphp
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,7 +36,7 @@
         }
         #page-transition.hide { opacity: 0; }
 
-        /* ========== NAVBAR (disamakan dengan halaman Beranda) ========== */
+        /* ========== NAVBAR ========== */
         .nav-wrap {
             position: fixed;
             top: 0; left: 0; width: 100%;
@@ -68,7 +68,6 @@
             flex-shrink: 0;
         }
 
-        /* ===== EN | ID language switch ===== */
         .lang-switch {
             display: flex; align-items: center; gap: 4px;
             font-family: 'Poppins', sans-serif;
@@ -77,16 +76,19 @@
             flex-shrink: 0; user-select: none;
         }
         .nav-wrap.scrolled .lang-switch { color: #3B2A20; }
+        .lang-switch a,
         .lang-switch button {
             background: none; border: none; padding: 0; margin: 0;
             font: inherit; color: inherit; cursor: pointer;
             opacity: 0.6; transition: opacity 0.2s ease;
+            text-decoration: none;
         }
+        .lang-switch a.active,
         .lang-switch button.active { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
+        .lang-switch a:hover,
         .lang-switch button:hover { opacity: 1; }
         .lang-switch .lang-sep { opacity: 0.5; }
 
-        /* ===== SEARCH (icon -> expand) ===== */
         .nav-search {
             display: flex; align-items: center; gap: 6px;
             background-color: transparent;
@@ -246,7 +248,6 @@
         }
         .nav-overlay.open { display: block; opacity: 1; }
 
-        /* ========== HERO BANNER ========== */
         .page-hero {
             position: relative;
             width: 100%;
@@ -264,7 +265,6 @@
             background-color: #D1B89A;
         }
 
-        /* ========== MAIN CONTENT ========== */
         .page-main {
             background: #F2E7D5;
             padding: 18px 0 100px;
@@ -483,7 +483,6 @@
             font-size: 0.95rem;
         }
 
-        /* ========== FOOTER ========== */
         footer {
             background-color: #7B5E4A;
             color: #F2E7D5;
@@ -638,20 +637,22 @@
                     <img src="{{ asset('image/logo.png') }}" alt="Tuhomestay Logo" class="logo-image"
                          onerror="this.src='https://placehold.co/120x50/F2E7D5/3B2A20?text=Tuhomestay'">
                 </li>
-                <li><a href="{{ url('/') }}">Beranda</a></li>
-                <li><a href="{{ url('/galeri') }}">Galeri</a></li>
-                <li><a href="{{ url('/pilihansewa') }}" class="active" aria-current="page">Pilihan Sewa</a></li>
-                <li><a href="{{ url('/tentangkami') }}">Tentang Kami</a></li>
+                <li><a href="{{ url('/') }}">{{ __('Beranda') }}</a></li>
+                <li><a href="{{ url('/galeri') }}">{{ __('Galeri') }}</a></li>
+                <li><a href="{{ url('/pilihansewa') }}" class="active" aria-current="page">{{ __('Pilihan Sewa') }}</a></li>
+                <li><a href="{{ url('/tentangkami') }}">{{ __('Tentang Kami') }}</a></li>
             </ul>
             <div class="nav-actions">
                 <div class="lang-switch" id="langSwitch" aria-label="Pilih bahasa">
-                    <button type="button" class="lang-btn" data-lang="en">EN</button>
+                    <a href="{{ route('lang.switch', 'en') }}"
+                       class="lang-btn {{ app()->getLocale() === 'en' ? 'active' : '' }}">EN</a>
                     <span class="lang-sep">|</span>
-                    <button type="button" class="lang-btn active" data-lang="id">ID</button>
+                    <a href="{{ route('lang.switch', 'id') }}"
+                       class="lang-btn {{ app()->getLocale() === 'id' ? 'active' : '' }}">ID</a>
                 </div>
 
-                <form class="nav-search" id="navSearchForm" role="search">
-                    <input type="search" id="navSearchInput" placeholder="Pencarian..." aria-label="Cari" autocomplete="off">
+                <form class="nav-search" id="navSearchForm" role="search" action="{{ url('/pilihansewa') }}" method="GET">
+                    <input type="search" id="navSearchInput" name="q" placeholder="{{ __('Pencarian...') }}" aria-label="Cari" autocomplete="off">
                     <button type="submit" class="nav-search-btn" id="navSearchBtn" aria-label="Cari"><i class="fa-solid fa-magnifying-glass"></i></button>
                 </form>
 
@@ -664,7 +665,7 @@
                         @endif
                     </a>
                 @else
-                    <a href="{{ url('/register') }}" class="nav-daftar-btn">Daftar | Masuk</a>
+                    <a href="{{ url('/register') }}" class="nav-daftar-btn">{{ __('Daftar | Masuk') }}</a>
                 @endif
 
                 <button type="button" class="nav-hamburger" id="navHamburger" aria-label="Buka menu">
@@ -681,35 +682,35 @@
             <div class="filter-group">
                 <div class="filter-select-wrap">
                     <select id="filterTipe" class="filter-select">
-                        <option value="all">Tipe Sewa</option>
-                        <option value="kamar">Sewa Kamar</option>
-                        <option value="rumah">Sewa Satu Rumah</option>
+                        <option value="all">{{ __('Tipe Sewa') }}</option>
+                        <option value="kamar">{{ __('Sewa Kamar') }}</option>
+                        <option value="rumah">{{ __('Sewa Satu Rumah') }}</option>
                     </select>
                     <i class="fa-solid fa-chevron-down"></i>
                 </div>
                 <div class="filter-select-wrap">
                     <select id="filterKapasitas" class="filter-select">
-                        <option value="all">Kapasitas Orang</option>
-                        <option value="1">1 Orang</option>
-                        <option value="2">2 Orang</option>
-                        <option value="3-4">3-4 Orang</option>
-                        <option value="5+">+5 Orang</option>
+                        <option value="all">{{ __('Kapasitas Orang') }}</option>
+                        <option value="1">{{ __('1 Orang') }}</option>
+                        <option value="2">{{ __('2 Orang') }}</option>
+                        <option value="3-4">{{ __('3-4 Orang') }}</option>
+                        <option value="5+">{{ __('+5 Orang') }}</option>
                     </select>
                     <i class="fa-solid fa-chevron-down"></i>
                 </div>
                 <div class="filter-select-wrap">
                     <select id="filterLokasi" class="filter-select">
-                        <option value="all">Lokasi Kost</option>
+                        <option value="all">{{ __('Lokasi Kost') }}</option>
                         <option value="tulungagung">Tulungagung</option>
-                        <option value="batu">Batu, Punten</option>
+                        <option value="batu">{{ __('Batu, Punten') }}</option>
                     </select>
                     <i class="fa-solid fa-chevron-down"></i>
                 </div>
                 <div class="filter-select-wrap">
                     <select id="filterStatus" class="filter-select">
-                        <option value="all">Status</option>
-                        <option value="available">Tersedia</option>
-                        <option value="full">Penuh</option>
+                        <option value="all">{{ __('Status') }}</option>
+                        <option value="available">{{ __('Tersedia') }}</option>
+                        <option value="full">{{ __('Penuh') }}</option>
                     </select>
                     <i class="fa-solid fa-chevron-down"></i>
                 </div>
@@ -718,12 +719,12 @@
                 <div class="grid-icon" aria-hidden="true">
                     <span></span><span></span><span></span><span></span>
                 </div>
-                <span id="roomCount">{{ count($propertis ?? []) }} properti</span>
+                <span id="roomCount">{{ count($kamars ?? []) }} {{ __('properti') }}</span>
             </div>
         </div>
 
         <section class="rooms-grid" id="roomsGrid">
-            @forelse($propertis ?? [] as $p)
+            @forelse($kamars ?? [] as $p)
                 @php
                     $gambar = $p->gambar_utama
                         ? asset('storage/' . $p->gambar_utama)
@@ -732,9 +733,9 @@
                     $status     = $p->status ?? 'available';
                     $tipe       = ($p->fleksibel ?? false) ? 'kamar rumah' : 'rumah';
                     $kapasitas  = $p->kapasitas ?? '3-4';
-                    $lokasi     = $p->lokasi ?? 'tulungagung';
+                    $lokasi     = $p->cabang ?? 'tulungagung';
                     $namaLokasi = $lokasi === 'batu' ? 'Batu, Punten' : 'Tulungagung';
-                    $badgeTipe  = ($p->fleksibel ?? false) ? 'Sewa Kamar & Rumah' : 'Sewa Satu Rumah';
+                    $badgeTipe  = ($p->fleksibel ?? false) ? __('Sewa Kamar & Rumah') : __('Sewa Satu Rumah');
                     $fasilitas  = is_array($p->fasilitas) ? $p->fasilitas : [];
                     $kamarMandi = $fasilitas['kamar_mandi'] ?? 1;
                     $colokan    = $fasilitas['colokan'] ?? 2;
@@ -749,17 +750,17 @@
 
                     <div class="thumb">
                         <img src="{{ $gambar }}"
-                             alt="{{ $p->nama }}"
+                             alt="{{ $p->nama_kamar }}"
                              onerror="this.src='{{ asset('image/default-properti.jpg') }}'">
                         <span class="tipe-badge">{{ $badgeTipe }}</span>
                     </div>
 
                     <div class="room-body">
                         <div class="title-row">
-                            <h2>{{ $p->nama }}</h2>
+                            <h2>{{ $p->nama_kamar }}</h2>
                             <span class="status-badge {{ $status }}">
                                 <span class="status-dot"></span>
-                                {{ $status === 'available' ? 'Tersedia' : 'Penuh' }}
+                                {{ $status === 'available' ? __('Tersedia') : __('Penuh') }}
                             </span>
                         </div>
 
@@ -772,17 +773,17 @@
                         </div>
 
                         <div class="icon-row">
-                            <span><i class="fa-solid fa-bed"></i> {{ $p->total_kamar ?? 1 }} Kamar</span>
-                            <span><i class="fa-solid fa-shower"></i> {{ $kamarMandi }} kamar mandi</span>
-                            <span><i class="fa-solid fa-plug"></i> {{ $colokan }} colokan</span>
+                            <span><i class="fa-solid fa-bed"></i> {{ $p->total_kamar ?? 1 }} {{ __('Kamar') }}</span>
+                            <span><i class="fa-solid fa-shower"></i> {{ $kamarMandi }} {{ __('kamar mandi') }}</span>
+                            <span><i class="fa-solid fa-plug"></i> {{ $colokan }} {{ __('colokan') }}</span>
                         </div>
 
                         <div class="room-footer">
                             <span class="room-footer-desc">
                                 @if($p->fleksibel)
-                                    Bisa sewa kamar atau satu rumah penuh
+                                    {{ __('Bisa sewa kamar atau satu rumah penuh') }}
                                 @else
-                                    Disewa satu rumah penuh
+                                    {{ __('Disewa satu rumah penuh') }}
                                 @endif
                             </span>
                         </div>
@@ -790,7 +791,7 @@
                 </a>
             @empty
                 <div class="no-results">
-                    Belum ada properti yang tersedia saat ini.
+                    {{ __('Belum ada properti yang tersedia saat ini.') }}
                 </div>
             @endforelse
         </section>
@@ -799,7 +800,7 @@
     <footer>
         <div class="footer-container">
             <div class="footer-about">
-                <p>Tulungagung &amp; Batu Homestay menyediakan tempat menginap yang nyaman dan tenang untuk menemani perjalananmu. Temukan pilihan akomodasi yang cocok untuk perjalanan keluarga, maupun kebutuhan menginap lainnya.</p>
+                <p>{{ __('Tulungagung & Batu Homestay menyediakan tempat menginap yang nyaman dan tenang untuk menemani perjalananmu. Temukan pilihan akomodasi yang cocok untuk perjalanan keluarga, maupun kebutuhan menginap lainnya.') }}</p>
                 <div class="social-links">
                     <a href="#"><i class="fa-brands fa-instagram"></i></a>
                     <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
@@ -807,21 +808,21 @@
                 </div>
             </div>
             <div class="footer-links">
-                <h3>Navigasi Cepat</h3>
+                <h3>{{ __('Navigasi Cepat') }}</h3>
                 <ul>
-                    <li><a href="{{ url('/') }}">Beranda</a></li>
-                    <li><a href="{{ url('/pilihansewa') }}">Pilihan Sewa</a></li>
-                    <li><a href="{{ url('/galeri') }}">Galeri</a></li>
-                    <li><a href="{{ url('/tentangkami') }}">Tentang Kami</a></li>
+                    <li><a href="{{ url('/') }}">{{ __('Beranda') }}</a></li>
+                    <li><a href="{{ url('/pilihansewa') }}">{{ __('Pilihan Sewa') }}</a></li>
+                    <li><a href="{{ url('/galeri') }}">{{ __('Galeri') }}</a></li>
+                    <li><a href="{{ url('/tentangkami') }}">{{ __('Tentang Kami') }}</a></li>
                 </ul>
             </div>
             <div class="footer-contact">
-                <h3>Hubungi Kami</h3>
-                <p>WhatsApp</p>
-                <p>Facebook</p>
+                <h3>{{ __('Hubungi Kami') }}</h3>
+                <p>{{ __('WhatsApp') }}</p>
+                <p>{{ __('Facebook') }}</p>
             </div>
         </div>
-        <div class="copyright">&copy; {{ date('Y') }} Tulungagung &amp; Batu Homestay. Hak Cipta Dilindungi.</div>
+        <div class="copyright">&copy; {{ date('Y') }} Tulungagung &amp; Batu Homestay. {{ __('Hak Cipta Dilindungi.') }}</div>
     </footer>
 
     <script>
@@ -862,7 +863,6 @@
             window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
         }
 
-        // ===== Search: icon -> expand =====
         const navSearchForm = document.getElementById('navSearchForm');
         const navSearchInput = document.getElementById('navSearchInput');
         const navSearchBtn = document.getElementById('navSearchBtn');
@@ -889,17 +889,9 @@
             if (navSearchForm && !navSearchForm.contains(e.target)) collapseSearch();
         });
 
-        // ===== EN | ID language switch (UI only, siap dihubungkan ke sistem terjemahan) =====
-        const langSwitch = document.getElementById('langSwitch');
-        langSwitch?.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                langSwitch.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                // TODO: hubungkan ke sistem terjemahan (mis. Laravel Localization) berdasarkan btn.dataset.lang
-            });
-        });
-
         document.querySelectorAll('a[href]').forEach(link => {
+            if (link.closest('.lang-switch')) return;
+
             link.addEventListener('click', function(e) {
                 const href = this.getAttribute('href');
                 if (!href || href.startsWith('#') || this.target === '_blank' || /^(https?:|mailto:|tel:)/.test(href)) {
@@ -913,7 +905,6 @@
             });
         });
 
-        // Filter
         const roomsGrid = document.getElementById('roomsGrid');
         const roomCountEl = document.getElementById('roomCount');
         let noResultsEl = null;
@@ -939,13 +930,13 @@
                 if (ok) visible++;
             });
 
-            roomCountEl.textContent = visible + ' properti';
+            roomCountEl.textContent = visible + ' {{ __("properti") }}';
 
             if (visible === 0) {
                 if (!noResultsEl) {
                     noResultsEl = document.createElement('div');
                     noResultsEl.className = 'no-results';
-                    noResultsEl.textContent = 'Tidak ada properti yang cocok dengan filter ini.';
+                    noResultsEl.textContent = '{{ __("Tidak ada properti yang cocok dengan filter ini.") }}';
                     roomsGrid.appendChild(noResultsEl);
                 }
             } else if (noResultsEl) {
