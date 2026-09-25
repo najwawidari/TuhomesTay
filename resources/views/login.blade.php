@@ -1,5 +1,4 @@
 @php
-    // $errors dan $old dikirim dari AuthController@showLogin
     $errors = $errors ?? [];
     $old    = $old ?? ['email' => '', 'phone' => ''];
     $rememberEmail = request()->cookie('remember_email', '');
@@ -11,6 +10,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Masuk - TuhomesTay</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
   :root{
     --brown-dark:#3a2a1e;
@@ -94,6 +94,13 @@
   .desktop-view input::placeholder{ color:var(--placeholder); }
   .desktop-view input:focus{ box-shadow:0 0 0 3px rgba(184,134,63,0.35); }
   .desktop-view input.invalid{ box-shadow:0 0 0 2px var(--error); }
+
+  .desktop-view .hint-d{
+    font-size:12px; color:var(--error); font-weight:600;
+    display:none; padding-left:4px;
+  }
+  .desktop-view .field.show-hint .hint-d{ display:block; }
+
   .desktop-view .forgot{ text-align:right; font-size:13px; min-height:18px; }
   .desktop-view .forgot a{ color:var(--error); font-weight:600; text-decoration:none; }
   .desktop-view .forgot a:hover{ text-decoration:underline; }
@@ -132,8 +139,61 @@
 
   .mobile-view{ display:none; }
 
+  /* ===== TOAST ===== */
+  .toast-container {
+    position: fixed; top: 20px; right: 20px; z-index: 99999;
+    display: flex; flex-direction: column; gap: 12px;
+    max-width: 380px; pointer-events: none;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  .toast {
+    background: #FFFFFF; border-radius: 14px; padding: 14px 18px;
+    box-shadow: 0 10px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+    display: flex; align-items: flex-start; gap: 12px;
+    border-left: 5px solid #7B5E4A;
+    transform: translateX(120%); opacity: 0;
+    animation: toastIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    pointer-events: auto;
+    position: relative; overflow: hidden;
+  }
+  .toast.removing { animation: toastOut 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+  @keyframes toastIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes toastOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
+  .toast.success { border-left-color: #2E9E42; }
+  .toast.error   { border-left-color: #D64545; }
+  .toast.warning { border-left-color: #F0B429; }
+  .toast.info    { border-left-color: #3B82F6; }
+  .toast-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 0.95rem; color: #fff;
+  }
+  .toast.success .toast-icon { background: #2E9E42; }
+  .toast.error   .toast-icon { background: #D64545; }
+  .toast.warning .toast-icon { background: #F0B429; }
+  .toast.info    .toast-icon { background: #3B82F6; }
+  .toast-body { flex: 1; min-width: 0; }
+  .toast-title { font-size: 0.875rem; font-weight: 700; color: #2B2320; margin-bottom: 2px; }
+  .toast-message { font-size: 0.8rem; color: #7B5E4A; line-height: 1.45; word-wrap: break-word; }
+  .toast-close {
+    background: none; border: none; color: #9C948A; cursor: pointer;
+    width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; font-size: 0.8rem; flex-shrink: 0;
+  }
+  .toast-close:hover { background: #F1F1F1; color: #3B2A20; }
+  .toast-progress {
+    position: absolute; bottom: 0; left: 0; height: 3px; width: 100%;
+    transform-origin: left; animation: toastProgress linear forwards;
+  }
+  .toast.success .toast-progress { background: #2E9E42; }
+  .toast.error   .toast-progress { background: #D64545; }
+  .toast.warning .toast-progress { background: #F0B429; }
+  .toast.info    .toast-progress { background: #3B82F6; }
+  @keyframes toastProgress { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
   @media (max-width:560px){
     .desktop-view{ display:none; }
+    .toast-container { top: auto; bottom: 20px; left: 16px; right: 16px; max-width: none; }
 
     .mobile-view{
       display:block;
@@ -187,7 +247,7 @@
 
     .field-m{ position:relative; }
     .field-m .icon{
-      position:absolute; left:14px; top:50%; transform:translateY(-50%);
+      position:absolute; left:14px; top:14px;
       width:18px; height:18px; color:var(--brown-mid); pointer-events:none;
       display:flex; align-items:center; justify-content:center;
     }
@@ -202,7 +262,7 @@
     .field-m input:focus{ box-shadow:0 0 0 3px rgba(184,134,63,0.35); }
     .field-m input.invalid{ box-shadow:0 0 0 2px var(--error); }
     .field-m .toggle-eye{
-      position:absolute; right:12px; top:50%; transform:translateY(-50%);
+      position:absolute; right:12px; top:14px;
       width:20px; height:20px; border:none; background:none; padding:0;
       color:var(--brown-mid); cursor:pointer; display:flex;
     }
@@ -272,6 +332,9 @@
 </head>
 <body>
 
+  <!-- ============ TOAST CONTAINER ============ -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <!-- ============ DESKTOP / LAPTOP ============ -->
   <div class="desktop-view">
     <div class="card">
@@ -280,7 +343,7 @@
       </div>
 
       <h1>Masuk ke TuhomesTay</h1>
-      <p class="hint-text">Isi Kata Sandi atau Nomor Telepon Anda</p>
+      <p class="hint-text">Isi Email, Kata Sandi, dan Nomor Telepon Anda</p>
 
       @if(!empty($errors['general']))
         <div class="error-box">{{ $errors['general'] }}</div>
@@ -293,19 +356,22 @@
                  value="{{ old('email', $old['email'] ?: $rememberEmail) }}"
                  class="@if(!empty($errors['email'])) invalid @endif"
                  autocomplete="email" required>
+          <p class="hint-d">{{ $errors['email'] ?? 'Masukkan email yang valid' }}</p>
         </div>
 
         <div class="field @if(!empty($errors['password'])) show-hint @endif" data-field="password">
           <input type="password" name="password" placeholder="Kata sandi"
                  class="@if(!empty($errors['password'])) invalid @endif"
-                 autocomplete="current-password">
+                 autocomplete="current-password" required aria-required="true">
+          <p class="hint-d">{{ $errors['password'] ?? 'Kata sandi wajib diisi' }}</p>
         </div>
 
         <div class="field @if(!empty($errors['phone'])) show-hint @endif" data-field="phone">
           <input type="tel" name="phone" placeholder="Nomor telepon"
                  value="{{ old('phone', $old['phone'] ?? '') }}"
                  class="@if(!empty($errors['phone'])) invalid @endif"
-                 autocomplete="tel" inputmode="numeric">
+                 autocomplete="tel" inputmode="numeric" required aria-required="true">
+          <p class="hint-d">{{ $errors['phone'] ?? 'Nomor telepon wajib diisi' }}</p>
         </div>
 
         <div class="forgot">
@@ -368,11 +434,11 @@
             </span>
             <input type="password" name="password" placeholder="Kata sandi"
                    class="@if(!empty($errors['password'])) invalid @endif"
-                   autocomplete="current-password">
+                   autocomplete="current-password" required aria-required="true">
             <button type="button" class="toggle-eye" aria-label="Tampilkan kata sandi">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
-            <p class="hint-m">{{ $errors['password'] ?? 'Isi salah satu: kata sandi atau nomor telepon' }}</p>
+            <p class="hint-m">{{ $errors['password'] ?? 'Kata sandi wajib diisi' }}</p>
           </div>
 
           <div class="field-m @if(!empty($errors['phone'])) show-hint @endif" data-field="phone">
@@ -382,8 +448,8 @@
             <input type="tel" name="phone" placeholder="Nomor telepon"
                    value="{{ old('phone', $old['phone'] ?? '') }}"
                    class="@if(!empty($errors['phone'])) invalid @endif"
-                   autocomplete="tel" inputmode="numeric">
-            <p class="hint-m">{{ $errors['phone'] ?? 'Format nomor telepon tidak valid' }}</p>
+                   autocomplete="tel" inputmode="numeric" required aria-required="true">
+            <p class="hint-m">{{ $errors['phone'] ?? 'Nomor telepon wajib diisi' }}</p>
           </div>
 
           <div class="options-row">
@@ -420,6 +486,58 @@
   </div>
 
 <script>
+  // ===== TOAST SYSTEM =====
+  window.showToast = function(type, title, message, duration) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    duration = duration || 4500;
+    const iconMap = { success:'fa-circle-check', error:'fa-circle-xmark', warning:'fa-triangle-exclamation', info:'fa-circle-info' };
+    const icon = iconMap[type] || iconMap.info;
+
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = `
+      <div class="toast-icon"><i class="fa-solid ${icon}"></i></div>
+      <div class="toast-body">
+        <div class="toast-title">${title}</div>
+        <div class="toast-message">${message}</div>
+      </div>
+      <button type="button" class="toast-close" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      <div class="toast-progress"></div>
+    `;
+    container.appendChild(toast);
+    const progress = toast.querySelector('.toast-progress');
+    progress.style.animationDuration = duration + 'ms';
+
+    const remove = () => {
+      toast.classList.add('removing');
+      setTimeout(() => toast.remove(), 350);
+    };
+    toast.querySelector('.toast-close').addEventListener('click', remove);
+    setTimeout(remove, duration);
+  };
+
+  // ===== TAMPILKAN TOAST UNTUK FLASH MESSAGE & ERRORS =====
+  document.addEventListener('DOMContentLoaded', function () {
+    @if(session('success'))
+      window.showToast('success', 'Berhasil!', @json(session('success')), 4500);
+    @endif
+    @if(session('error'))
+      window.showToast('error', 'Gagal!', @json(session('error')), 5000);
+    @endif
+    @if(session('warning'))
+      window.showToast('warning', 'Perhatian', @json(session('warning')), 4500);
+    @endif
+    @if(session('info'))
+      window.showToast('info', 'Info', @json(session('info')), 4000);
+    @endif
+    @if(!empty($errors) && !session('success') && !session('error'))
+      @php $errText = collect(array_values($errors))->take(3)->implode(' • '); @endphp
+      window.showToast('error', 'Ada kesalahan', @json($errText), 6000);
+    @endif
+  });
+
+  // ===== TOGGLE EYE =====
   document.querySelectorAll('.toggle-eye').forEach(btn => {
     btn.addEventListener('click', () => {
       const input = btn.closest('.field-m').querySelector('input');
@@ -427,11 +545,16 @@
     });
   });
 
-  function invalidateField(field, invalid){
+  // ===== VALIDASI FORM =====
+  function invalidateField(field, invalid, message){
     if (!field) return;
     field.classList.toggle('show-hint', invalid);
-    const input = field.querySelector('input');
-    if(input) input.classList.toggle('invalid', invalid);
+    const input = field.querySelector('input:not([type="checkbox"])');
+    if (input) input.classList.toggle('invalid', invalid);
+    if (invalid && message) {
+      const hint = field.querySelector('.hint-m, .hint-d');
+      if (hint) hint.textContent = message;
+    }
   }
 
   function validateEmail(value){
@@ -443,6 +566,13 @@
   }
 
   document.querySelectorAll('form.auth-form').forEach(form => {
+    form.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const field = inp.closest('[data-field]');
+        if (field) invalidateField(field, false);
+      });
+    });
+
     form.addEventListener('submit', function(e){
       let valid = true;
 
@@ -455,36 +585,49 @@
       const phoneInput = phoneField?.querySelector('input');
 
       if (emailInput) {
-        const emailOk = validateEmail(emailInput.value.trim());
-        invalidateField(emailField, !emailOk);
-        if(!emailOk) valid = false;
+        const emailValue = emailInput.value.trim();
+        if (emailValue === '') {
+          invalidateField(emailField, true, 'Email wajib diisi');
+          valid = false;
+        } else if (!validateEmail(emailValue)) {
+          invalidateField(emailField, true, 'Masukkan email yang valid');
+          valid = false;
+        } else {
+          invalidateField(emailField, false);
+        }
       }
 
-      const passwordFilled = passwordInput && passwordInput.value.trim().length > 0;
-      const phoneFilled = phoneInput && phoneInput.value.trim().length > 0;
+      if (passwordInput) {
+        if (passwordInput.value.trim() === '') {
+          invalidateField(passwordField, true, 'Kata sandi wajib diisi');
+          valid = false;
+        } else {
+          invalidateField(passwordField, false);
+        }
+      }
 
-      if(!passwordFilled && !phoneFilled){
-        invalidateField(passwordField, true);
-        invalidateField(phoneField, true);
-        valid = false;
-      } else {
-        invalidateField(passwordField, false);
-
-        if(phoneFilled && !validatePhone(phoneInput.value.trim())){
-          invalidateField(phoneField, true);
+      if (phoneInput) {
+        const phoneValue = phoneInput.value.trim();
+        if (phoneValue === '') {
+          invalidateField(phoneField, true, 'Nomor telepon wajib diisi');
+          valid = false;
+        } else if (!validatePhone(phoneValue)) {
+          invalidateField(phoneField, true, 'Format nomor telepon tidak valid');
           valid = false;
         } else {
           invalidateField(phoneField, false);
         }
       }
 
-      if(!valid) {
+      if (!valid) {
         e.preventDefault();
+        const firstInvalid = form.querySelector('input.invalid');
+        if (firstInvalid) firstInvalid.focus();
         return;
       }
 
       const btn = form.querySelector('button[type="submit"]');
-      if(btn){
+      if (btn) {
         btn.disabled = true;
         btn.textContent = 'memproses...';
       }

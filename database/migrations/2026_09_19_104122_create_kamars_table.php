@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('kamars')) {
+            return;
+        }
+
         Schema::create('kamars', function (Blueprint $table) {
             $table->id();
             $table->string('nama_kamar', 150);
@@ -17,9 +21,12 @@ return new class extends Migration
             $table->integer('harga')->default(0);
             $table->integer('harga_holiday')->nullable();
             $table->integer('harga_kamar')->nullable();
+            $table->integer('harga_rumah_mid')->nullable();
             $table->text('deskripsi')->nullable();
             $table->longText('fasilitas')->nullable();
             $table->text('keterangan')->nullable();
+            $table->string('gambar_utama')->nullable();
+            $table->json('gallery')->nullable();
             $table->string('alamat', 255)->nullable();
             $table->text('map_embed')->nullable();
             $table->integer('total_kamar')->default(1);

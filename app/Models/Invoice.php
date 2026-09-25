@@ -3,19 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Invoice extends Model
 {
     protected $table = 'invoices';
 
     protected $fillable = [
-        'id_booking',        // FK ke bookings
-        'metode_pembayaran', // visa/bca/gopay/mandiri
-        'tg_transaksi',      // tanggal transaksi
+        'kode_invoice',
+        'id_booking',
+        'id_penyewa',
+        'metode_pembayaran',
+        'tg_transaksi',
         'checkin',
         'checkout',
         'koin_digunakan',
         'total_bayar',
+        'status',
     ];
 
     protected $casts = [
@@ -26,22 +30,25 @@ class Invoice extends Model
         'koin_digunakan' => 'integer',
     ];
 
-    // ===== Relasi =====
+    protected static function booted(): void
+    {
+        static::creating(function ($invoice) {
+            if (empty($invoice->kode_invoice)) {
+                $invoice->kode_invoice = 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(5));
+            }
+        });
+    }
 
-    /**
-     * Relasi ke booking.
-     */
     public function booking()
     {
         return $this->belongsTo(Booking::class, 'id_booking');
     }
 
-    // ===== Accessor =====
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_penyewa');
+    }
 
-    /**
-     * Accessor: label metode pembayaran.
-     * Pemakaian: {{ $invoice->metode_label }}
-     */
     public function getMetodeLabelAttribute(): string
     {
         return match (strtolower($this->metode_pembayaran ?? '')) {
@@ -50,16 +57,23 @@ class Invoice extends Model
             'gopay'   => 'GoPay',
             'mandiri' => 'Mandiri',
             'tunai'   => 'Tunai (Offline)',
+            'midtrans' => 'Midtrans',
             default   => ucfirst($this->metode_pembayaran ?? 'Belum dipilih'),
         };
     }
 
-    /**
-     * Accessor: label total bayar.
-     * Pemakaian: {{ $invoice->total_rp }}
-     */
     public function getTotalRpAttribute(): string
     {
         return 'Rp ' . number_format($this->total_bayar ?? 0, 0, ',', '.');
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            'pending' => 'Belum Dibayar',
+            'lunas'   => 'Lunas',
+            'batal'   => 'Dibatalkan',
+            default   => ucfirst($this->status ?? '-'),
+        };
     }
 }

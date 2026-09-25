@@ -92,7 +92,7 @@ class AuthController extends Controller
         Auth::login($user, $remember);
         $request->session()->regenerate();
 
-        // ✅ Redirect berdasarkan role
+        // Redirect berdasarkan role
         $response = $user->role === 'admin'
             ? redirect()->intended(route('admin.beranda'))->with('success', 'Selamat datang, Admin!')
             : redirect()->intended('/')->with('success', 'Login berhasil! Selamat datang, ' . $user->nama_lengkap);
@@ -226,21 +226,26 @@ class AuthController extends Controller
     }
 
     // ============================================================
-    // GOOGLE LOGIN
+    // GOOGLE LOGIN & REGISTER
     // ============================================================
 
     /**
-     * Redirect ke halaman login Google.
+     * Redirect ke halaman OAuth Google.
+     * Parameter ?from=register akan disimpan di session
+     * supaya callback tahu konteksnya (login / register).
      */
-    public function redirectToGoogle()
+    public function redirectToGoogle(Request $request)
     {
+        $from = $request->query('from', 'login');
+        session(['google_oauth_from' => $from]);
+
         return Socialite::driver('google')->redirect();
     }
 
     /**
-     * Callback dari Google setelah user login.
+     * Callback dari Google setelah user login/register.
      */
-    public function handleGoogleCallback()
+    public function handleGoogleCallback(Request $request)
     {
         try {
             $googleUser = Socialite::driver('google')->user();
@@ -256,6 +261,10 @@ class AuthController extends Controller
                 ->withErrors(['general' => 'Akun Google tidak memberikan email.']);
         }
 
+        // Ambil konteks (login / register)
+        $from = session('google_oauth_from', 'login');
+        session()->forget('google_oauth_from');
+
         // Cari user berdasarkan email
         $user = User::where('email', $email)->first();
 
@@ -264,7 +273,7 @@ class AuthController extends Controller
             $user = User::create([
                 'nama_lengkap'      => $googleUser->getName() ?? 'User Baru',
                 'email'             => $email,
-                'password'          => Hash::make(Str::random(32)), // password random (tidak dipakai untuk login Google)
+                'password'          => Hash::make(Str::random(32)),
                 'no_telp'           => null,
                 'role'              => 'user',
                 'saldo_koin'        => 0,
@@ -274,11 +283,16 @@ class AuthController extends Controller
 
         // Login pakai Auth Laravel
         Auth::login($user, true);
-        request()->session()->regenerate();
+        $request->session()->regenerate();
+
+        // Pesan sukses sesuai konteks
+        $pesan = $from === 'register'
+            ? 'Registrasi berhasil! Selamat datang, ' . $user->nama_lengkap . '!'
+            : 'Login berhasil! Selamat datang, ' . $user->nama_lengkap;
 
         // Redirect berdasarkan role
         return $user->role === 'admin'
             ? redirect()->intended(route('admin.beranda'))->with('success', 'Selamat datang, Admin!')
-            : redirect()->intended('/')->with('success', 'Login berhasil! Selamat datang, ' . $user->nama_lengkap);
+            : redirect()->intended('/')->with('success', $pesan);
     }
 }

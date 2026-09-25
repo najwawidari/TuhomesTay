@@ -1,0 +1,70 @@
+{
+    "id": "/admin",
+    "name": "TuhomesTay Admin",
+    "short_name": "TuhomesTay",
+    "description": "Dashboard admin TuhomesTay untuk kelola pesanan, reservasi, dan penginapan.",
+    "start_url": "/admin",
+    "scope": "/",
+    "display": "standalone",
+    "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+    "orientation": "portrait",
+    "background_color": "#FFFFFF",
+    "theme_color": "#B0896A",
+    "lang": "id",
+    "dir": "ltr",
+    "categories": ["business", "productivity"],
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "/image/pwa-icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/image/pwa-icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/image/pwa-icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/image/pwa-icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Reservasi Baru",
+            "short_name": "Reservasi",
+            "url": "/admin/reservasi",
+            "description": "Lihat pesanan baru",
+            "icons": [
+                {
+                    "src": "/image/pwa-icon-192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Ulasan & Pesan",
+            "short_name": "Ulasan",
+            "url": "/admin/ulasan-pesan",
+            "description": "Cek pesan dari tamu"
+        },
+        {
+            "name": "Chat Masuk",
+            "short_name": "Chat",
+            "url": "/admin/chat",
+            "description": "Buka chat dengan tamu"
+        }
+    ]
+}

@@ -7,6 +7,7 @@ use App\Models\KontakPesan;
 use App\Models\Booking;
 use App\Models\Kamar;
 use App\Models\User;
+use App\Models\Ulasan;
 
 class AdminDashboardController extends Controller
 {
@@ -15,7 +16,6 @@ class AdminDashboardController extends Controller
         // ===== KAMAR =====
         $kamars = Kamar::orderBy('id')->get();
 
-        // Statistik kamar per cabang
         $totalTulungagung = Kamar::where('cabang', 'tulungagung')->count();
         $totalBatu        = Kamar::where('cabang', 'batu')->count();
 
@@ -42,13 +42,6 @@ class AdminDashboardController extends Controller
 
         $reservasiTerbaru = Booking::whereDate('created_at', today()->subDay())->count();
 
-        // Payment breakdown (kalau nanti ada kolom metode_pembayaran di bookings)
-        // $payBreakdown = Booking::where('status_booking', 'dibayar')
-        //     ->whereMonth('paid_at', now()->month)
-        //     ->selectRaw('metode_pembayaran, count(*) as total')
-        //     ->groupBy('metode_pembayaran')
-        //     ->pluck('total', 'metode_pembayaran')
-        //     ->toArray();
         $payBreakdown = [];
 
         // ===== USERS =====
@@ -56,6 +49,24 @@ class AdminDashboardController extends Controller
 
         $penggunaAktif = User::where('created_at', '>=', now()->subDays(30))->count();
         $penggunaTotal = User::count();
+
+        // ===== ULASAN (BARU!) =====
+        $ulasanTerbaru = Ulasan::with(['penyewa', 'kamar'])
+            ->where('status', 'visible')
+            ->orderByDesc('created_at')
+            ->limit(3)
+            ->get();
+
+        // Rata-rata rating per kategori
+        $totalUlasan = Ulasan::where('status', 'visible')->count();
+        $ratingRingkasan = [
+            'total'      => $totalUlasan,
+            'overall'    => $totalUlasan > 0 ? round(Ulasan::where('status', 'visible')->avg('rating_overall'), 1) : 0,
+            'kebersihan' => $totalUlasan > 0 ? round(Ulasan::where('status', 'visible')->avg('rating_kebersihan'), 1) : 0,
+            'kenyamanan' => $totalUlasan > 0 ? round(Ulasan::where('status', 'visible')->avg('rating_kenyamanan'), 1) : 0,
+            'fasilitas'  => $totalUlasan > 0 ? round(Ulasan::where('status', 'visible')->avg('rating_fasilitas'), 1) : 0,
+            'pelayanan'  => $totalUlasan > 0 ? round(Ulasan::where('status', 'visible')->avg('rating_pelayanan'), 1) : 0,
+        ];
 
         return view('admin.beranda', compact(
             'kamars',
@@ -67,7 +78,8 @@ class AdminDashboardController extends Controller
             'transaksiBulanIni',
             'reservasiTerbaru',
             'payBreakdown',
-            'penggunaAktif', 'penggunaTotal'
+            'penggunaAktif', 'penggunaTotal',
+            'ulasanTerbaru', 'ratingRingkasan'
         ));
     }
 }

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tidak Ada Koneksi - TuhomesTay</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #F1E6D9;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: #2B2320;
+            text-align: center;
+        }
+        .box {
+            background: #FFFFFF;
+            border-radius: 20px;
+            padding: 40px 32px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(43, 35, 32, 0.12);
+        }
+        .icon {
+            width: 80px; height: 80px;
+            margin: 0 auto 20px;
+            background: #F1E6D9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon svg {
+            width: 40px; height: 40px;
+            color: #B0896A;
+        }
+        h1 {
+            font-size: 22px;
+            font-weight: 800;
+            color: #43281B;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 14px;
+            color: #8A7C6D;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        button {
+            background: #B0896A;
+            color: #fff;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+        button:hover { background: #8B6B4F; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 1l22 22"/>
+                <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+                <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+                <path d="M10.71 5.05A16 16 0 0 1 22.58 9"/>
+                <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+                <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+                <line x1="12" y1="20" x2="12.01" y2="20"/>
+            </svg>
+        </div>
+        <h1>Tidak Ada Koneksi</h1>
+        <p>Sepertinya kamu sedang offline. Periksa koneksi internet dan coba lagi.</p>
+        <button onclick="location.reload()">Coba Lagi</button>
+    </div>
+</body>
+</html>

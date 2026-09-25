@@ -9,7 +9,11 @@ class PenginapanController extends Controller
 {
     public function index()
     {
-        $kamars = Kamar::orderBy('cabang')->orderBy('nama_kamar')->get();
+        // Eager load relasi bookingAktif agar tidak N+1 query
+        $kamars = Kamar::with('bookingAktif')
+            ->orderBy('cabang')
+            ->orderBy('nama_kamar')
+            ->get();
 
         $totalPenginapan = $kamars->count();
         $totalKamar      = $kamars->where('fleksibel', true)->sum('total_kamar');

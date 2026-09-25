@@ -52,7 +52,7 @@
     .tab-content.active { display: block; }
 
     /* ==============================================
-       PANEL ULASAN
+       PANEL
        ============================================== */
     .panel.ulasan-panel {
         border: 1px solid #797979;
@@ -129,7 +129,7 @@
     }
 
     /* ==============================================
-       ULASAN (review)
+       ULASAN
        ============================================== */
     .review {
         padding: 18px 0;
@@ -146,12 +146,20 @@
         gap: 12px;
     }
     .review-who { display: flex; align-items: center; gap: 10px; }
-    .review-who img {
+    .review-who img,
+    .review-who .avatar-initial {
         width: 38px;
         height: 38px;
         border-radius: 50%;
         object-fit: cover;
         flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--brown-tint);
+        color: var(--brown);
+        font-weight: 800;
+        font-size: 14px;
     }
     .review-top .rname { font-size: 13.5px; font-weight: 700; }
     .review-top .rmeta {
@@ -173,7 +181,6 @@
         max-width: 720px;
     }
 
-    /* Reply box (balasan yang sudah dikirim) */
     .review-reply {
         display: flex;
         gap: 10px;
@@ -207,11 +214,7 @@
         margin-bottom: 3px;
         display: block;
     }
-    .review-reply .rr-text {
-        display: block;
-    }
 
-    /* Action buttons */
     .review-actions {
         display: flex;
         align-items: center;
@@ -252,7 +255,19 @@
     }
     .link-edit:hover { text-decoration: underline; }
 
-    /* Reply form (belum dikirim) */
+    .btn-hapus {
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #B02B15;
+        background: none;
+        border: none;
+        font-family: inherit;
+        cursor: pointer;
+        padding: 0;
+        margin-left: auto;
+    }
+    .btn-hapus:hover { text-decoration: underline; }
+
     .reply-form {
         display: none;
         max-width: 720px;
@@ -307,15 +322,12 @@
         cursor: pointer;
     }
     .btn-send:hover { filter: brightness(1.08); }
+    .btn-send:disabled { opacity: 0.6; cursor: not-allowed; }
 
     /* ==============================================
        PESAN KONTAK
        ============================================== */
-    .msg-list {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
+    .msg-list { display: flex; flex-direction: column; gap: 12px; }
     .msg-item {
         display: flex;
         align-items: flex-start;
@@ -328,177 +340,105 @@
         position: relative;
     }
     .msg-item:hover { box-shadow: 0 4px 12px rgba(43, 35, 32, 0.06); }
-    .msg-item.baru {
-        border-left: 4px solid #E73D23;
-        padding-left: 13px;
-    }
-    .msg-item.dibaca {
-        border-left: 4px solid #2E5C99;
-        padding-left: 13px;
-    }
-    .msg-item.dibalas {
-        border-left: 4px solid #3FAE64;
-        padding-left: 13px;
-        background: #FAFDFB;
-    }
+    .msg-item.baru    { border-left: 4px solid #E73D23; padding-left: 13px; }
+    .msg-item.dibaca  { border-left: 4px solid #2E5C99; padding-left: 13px; }
+    .msg-item.dibalas { border-left: 4px solid #3FAE64; padding-left: 13px; background: #FAFDFB; }
 
     .msg-avatar {
-        width: 42px;
-        height: 42px;
+        width: 42px; height: 42px;
         border-radius: 50%;
         background: var(--brown-tint);
         color: var(--brown);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        font-size: 15px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 15px;
         flex-shrink: 0;
     }
     .msg-body { flex: 1; min-width: 0; }
     .msg-head {
-        display: flex;
-        align-items: flex-start;
+        display: flex; align-items: flex-start;
         justify-content: space-between;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-bottom: 6px;
+        gap: 10px; flex-wrap: wrap; margin-bottom: 6px;
     }
     .msg-email {
-        font-weight: 700;
-        font-size: 13.5px;
-        color: var(--ink);
-        word-break: break-all;
+        font-weight: 700; font-size: 13.5px;
+        color: var(--ink); word-break: break-all;
     }
     .msg-meta {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 11px;
-        color: var(--ink-soft);
-        flex-wrap: wrap;
+        display: flex; align-items: center;
+        gap: 8px; font-size: 11px;
+        color: var(--ink-soft); flex-wrap: wrap;
         margin-top: 3px;
     }
     .msg-meta .dot-sep { opacity: 0.5; }
     .msg-lokasi {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        background: var(--brown-tint);
-        color: var(--brown);
-        font-size: 10.5px;
-        font-weight: 700;
-        padding: 2px 8px;
-        border-radius: 999px;
+        display: inline-flex; align-items: center; gap: 4px;
+        background: var(--brown-tint); color: var(--brown);
+        font-size: 10.5px; font-weight: 700;
+        padding: 2px 8px; border-radius: 999px;
     }
     .msg-text {
-        font-size: 12.5px;
-        color: var(--ink);
-        line-height: 1.6;
-        margin-top: 8px;
-        white-space: pre-wrap;
-        word-wrap: break-word;
+        font-size: 12.5px; color: var(--ink);
+        line-height: 1.6; margin-top: 8px;
+        white-space: pre-wrap; word-wrap: break-word;
     }
 
     .msg-status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 10.5px;
-        font-weight: 700;
-        padding: 4px 10px;
-        border-radius: 999px;
-        white-space: nowrap;
-        flex-shrink: 0;
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 10.5px; font-weight: 700;
+        padding: 4px 10px; border-radius: 999px;
+        white-space: nowrap; flex-shrink: 0;
     }
     .msg-status-badge.baru    { background: #FDE4DF; color: #B02B15; }
     .msg-status-badge.dibaca  { background: #CFE0F2; color: #2E5C99; }
     .msg-status-badge.dibalas { background: #C9EBD3; color: #2A7A4C; }
     .msg-status-badge .dot-msg {
         width: 6px; height: 6px;
-        border-radius: 50%;
-        background: currentColor;
+        border-radius: 50%; background: currentColor;
     }
 
     .msg-actions {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        flex-wrap: wrap;
-        margin-top: 12px;
+        display: flex; align-items: center;
+        gap: 6px; flex-wrap: wrap; margin-top: 12px;
     }
     .msg-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        font-family: inherit;
-        font-size: 11.5px;
-        font-weight: 700;
-        padding: 7px 12px;
-        border-radius: 8px;
-        cursor: pointer;
-        text-decoration: none;
-        border: none;
+        display: inline-flex; align-items: center; gap: 5px;
+        font-family: inherit; font-size: 11.5px; font-weight: 700;
+        padding: 7px 12px; border-radius: 8px;
+        cursor: pointer; text-decoration: none; border: none;
         transition: filter 0.15s, background 0.15s;
     }
-    .msg-btn.wa {
-        background: #25D366;
-        color: #fff;
-    }
+    .msg-btn.wa       { background: #25D366; color: #fff; }
     .msg-btn.wa:hover { filter: brightness(0.95); }
-    .msg-btn.email {
-        background: #CFE0F2;
-        color: #2E5C99;
-    }
+    .msg-btn.email    { background: #CFE0F2; color: #2E5C99; }
     .msg-btn.email:hover { filter: brightness(0.96); }
-    .msg-btn.read {
-        background: #EDEAE4;
-        color: var(--ink);
-    }
+    .msg-btn.read     { background: #EDEAE4; color: var(--ink); }
     .msg-btn.read:hover { background: #E2DED6; }
-    .msg-btn.replied {
-        background: #C9EBD3;
-        color: #2A7A4C;
-    }
+    .msg-btn.replied  { background: #C9EBD3; color: #2A7A4C; }
     .msg-btn.replied:hover { filter: brightness(0.96); }
-    .msg-btn.delete {
-        background: #FDE4DF;
-        color: #B02B15;
-        margin-left: auto;
-    }
+    .msg-btn.delete   { background: #FDE4DF; color: #B02B15; margin-left: auto; }
     .msg-btn.delete:hover { filter: brightness(0.96); }
 
     /* Empty state */
     .empty-state {
-        text-align: center;
-        padding: 60px 20px;
+        text-align: center; padding: 60px 20px;
         color: var(--ink-soft);
     }
     .empty-state svg {
-        width: 56px;
-        height: 56px;
-        color: var(--line-strong);
-        margin-bottom: 14px;
+        width: 56px; height: 56px;
+        color: var(--line-strong); margin-bottom: 14px;
     }
     .empty-state h3 {
-        font-size: 15px;
-        font-weight: 700;
-        color: var(--ink);
-        margin-bottom: 6px;
+        font-size: 15px; font-weight: 700;
+        color: var(--ink); margin-bottom: 6px;
     }
     .empty-state p { font-size: 12.5px; }
 
-    /* Pagination */
     .pagination-wrap {
-        display: flex;
-        justify-content: center;
+        display: flex; justify-content: center;
         margin-top: 20px;
     }
     .pagination-wrap nav { display: block; }
 
-    /* ==============================================
-       RESPONSIVE
-       ============================================== */
     @media (max-width: 640px) {
         .review-top { flex-direction: column; align-items: flex-start; gap: 6px; }
         .reply-form-foot { flex-direction: column; align-items: flex-start; }
@@ -518,22 +458,24 @@
 <div class="stats">
     <div class="stat">
         <p class="label">{{ __('Rating Rata-rata') }}</p>
-        <p class="value">5.0<span style="color:#F0B429;font-size:13px;letter-spacing:1px;margin-left:4px;">★★★★★</span></p>
-        <p class="foot">{{ __('Dari 3 ulasan') }}</p>
+        <p class="value">
+            {{ number_format($ratingOverall, 1) }}<span style="color:#F0B429;font-size:13px;letter-spacing:1px;margin-left:4px;">★★★★★</span>
+        </p>
+        <p class="foot">{{ __('Dari') }} {{ $totalUlasan }} {{ __('ulasan') }}</p>
     </div>
     <div class="stat">
         <p class="label">{{ __('Total Ulasan') }}</p>
-        <p class="value">3</p>
+        <p class="value">{{ $totalUlasan }}</p>
         <p class="foot">{{ __('Sepanjang bulan ini') }}</p>
     </div>
     <div class="stat">
         <p class="label">{{ __('Pesan Kontak Baru') }}</p>
-        <p class="value">{{ $pesan->where('status', 'baru')->count() }}</p>
+        <p class="value">{{ $pesanBaru }}</p>
         <p class="foot">{{ __('Perlu direspon admin') }}</p>
     </div>
     <div class="stat">
         <p class="label">{{ __('Sudah Dibalas') }}</p>
-        <p class="value">{{ $pesan->where('status', 'dibalas')->count() }}</p>
+        <p class="value">{{ $pesanDibalas }}</p>
         <p class="foot">{{ __('Bulan ini') }}</p>
     </div>
 </div>
@@ -545,156 +487,150 @@
             <path d="M12 3l2.5 6.5H21l-5.2 4 2 6.5L12 16.5 6.2 20l2-6.5L3 9.5h6.5L12 3z"/>
         </svg>
         {{ __('Ulasan Penyewa') }}
+        @if($belumDibalas > 0)
+            <span class="tab-badge">{{ $belumDibalas }}</span>
+        @endif
     </button>
     <button class="tab-btn" data-tab="pesan" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
         {{ __('Pesan Kontak') }}
-        @if($pesan->where('status', 'baru')->count() > 0)
-            <span class="tab-badge">{{ $pesan->where('status', 'baru')->count() }}</span>
+        @if($pesanBaru > 0)
+            <span class="tab-badge">{{ $pesanBaru }}</span>
         @endif
     </button>
 </div>
 
 {{-- ============================================================
-     TAB 1: ULASAN PENYEWA
+     TAB 1: ULASAN PENYEWA (SEKARANG BACKEND!)
      ============================================================ --}}
 <div class="tab-content active" id="tab-ulasan">
     <div class="panel ulasan-panel">
         <div class="panel-head">
             <h2>{{ __('Ulasan Terbaru') }}</h2>
-            <span class="badge-brown">{{ __('Semua Cabang') }}</span>
+            <span class="badge-brown">{{ $ulasan->total() }} {{ __('ulasan') }}</span>
         </div>
 
-        <div class="toolbar">
+        <form method="GET" action="{{ route('admin.ulasanpesan') }}" class="toolbar">
             <div class="filter">
-                <select aria-label="Filter Cabang">
+                <select name="ulasan_lokasi" onchange="this.form.submit()" aria-label="Filter Cabang">
                     <option value="">{{ __('Semua Cabang') }}</option>
-                    <option value="tulungagung">{{ __('Kost Tulungagung') }}</option>
-                    <option value="batu">{{ __('Villa Batu, Malang') }}</option>
+                    <option value="tulungagung" {{ request('ulasan_lokasi') === 'tulungagung' ? 'selected' : '' }}>{{ __('Kost Tulungagung') }}</option>
+                    <option value="batu"        {{ request('ulasan_lokasi') === 'batu'        ? 'selected' : '' }}>{{ __('Villa Batu, Malang') }}</option>
                 </select>
             </div>
             <div class="filter">
-                <select aria-label="Filter Rating">
+                <select name="ulasan_rating" onchange="this.form.submit()" aria-label="Filter Rating">
                     <option value="">{{ __('Semua Rating') }}</option>
-                    <option value="5">★★★★★</option>
-                    <option value="4">★★★★</option>
-                    <option value="3">★★★</option>
+                    @for($i = 5; $i >= 1; $i--)
+                        <option value="{{ $i }}" {{ request('ulasan_rating') == $i ? 'selected' : '' }}>
+                            {{ str_repeat('★', $i) }}{{ str_repeat('☆', 5 - $i) }}
+                        </option>
+                    @endfor
                 </select>
             </div>
             <div class="filter">
-                <select aria-label="Filter Status Respon">
+                <select name="ulasan_status" onchange="this.form.submit()" aria-label="Filter Status Respon">
                     <option value="">{{ __('Semua Status') }}</option>
-                    <option value="belum">{{ __('Belum Dibalas') }}</option>
-                    <option value="sudah">{{ __('Sudah Dibalas') }}</option>
+                    <option value="belum" {{ request('ulasan_status') === 'belum' ? 'selected' : '' }}>{{ __('Belum Dibalas') }}</option>
+                    <option value="sudah" {{ request('ulasan_status') === 'sudah' ? 'selected' : '' }}>{{ __('Sudah Dibalas') }}</option>
                 </select>
             </div>
-        </div>
+            @if(request()->hasAny(['ulasan_lokasi','ulasan_rating','ulasan_status']))
+                <a href="{{ route('admin.ulasanpesan') }}" class="msg-btn read" style="padding:8px 14px;text-decoration:none;">{{ __('Reset') }}</a>
+            @endif
+        </form>
 
-        {{-- Ulasan 1 - belum dibalas --}}
-        <div class="review" id="review-1">
-            <div class="review-top">
-                <div class="review-who">
-                    <img src="https://i.pravatar.cc/64?img=21" alt="">
-                    <div>
-                        <div class="rname">@nanan_wiwawi</div>
-                        <div class="rmeta">{{ __('Kost Tulungagung') }} · {{ __('Kamar Reguler (Sewa Kamar)') }} · {{ __('2 hari lalu') }}</div>
+        @forelse($ulasan as $item)
+            @php
+                $inisial = $item->inisial_penyewa;
+                $fotoPenyewa = $item->foto_penyewa;
+                $namaPenyewa = $item->nama_penyewa;
+                $namaKamar = $item->kamar->nama_kamar ?? 'Kamar';
+                $namaCabang = ($item->kamar->cabang ?? 'tulungagung') === 'batu' ? 'Villa Batu, Malang' : 'Kost Tulungagung';
+                $jenisSewa = $item->booking->jenis_sewa ?? 'kamar';
+                $jenisSewaLabel = match($jenisSewa) {
+                    'kamar'      => 'Sewa Kamar',
+                    'rumah-full' => 'Sewa Rumah',
+                    'rumah-mid'  => 'Sewa Rumah + 1 Kamar',
+                    default      => ucfirst($jenisSewa),
+                };
+                $bintang = str_repeat('★', (int) $item->rating_overall) . str_repeat('☆', 5 - (int) $item->rating_overall);
+            @endphp
+            <div class="review" id="review-{{ $item->id }}">
+                <div class="review-top">
+                    <div class="review-who">
+                        @if($fotoPenyewa)
+                            <img src="{{ $fotoPenyewa }}" alt="{{ $namaPenyewa }}">
+                        @else
+                            <div class="avatar-initial">{{ $inisial }}</div>
+                        @endif
+                        <div>
+                            <div class="rname">{{ $namaPenyewa }}</div>
+                            <div class="rmeta">{{ $namaCabang }} · {{ $namaKamar }} ({{ $jenisSewaLabel }}) · {{ $item->waktu_relatif }}</div>
+                        </div>
+                    </div>
+                    <span class="stars">{{ $bintang }}</span>
+                </div>
+                <p class="review-body">{{ $item->komentar ?? '-' }}</p>
+
+                {{-- Balasan yang sudah ada --}}
+                @if($item->sudah_dibalas)
+                    <div class="review-reply" id="replyBox-{{ $item->id }}">
+                        <div class="rr-badge">HT</div>
+                        <div class="rr-body">
+                            <span class="rr-title">{{ __('Balasan Anda') }} · {{ optional($item->balasan_at)->diffForHumans() }}</span>
+                            <span class="rr-text">{{ $item->balasan_admin }}</span>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Form balas --}}
+                <div class="reply-form" id="replyForm-{{ $item->id }}">
+                    <textarea class="reply-textarea" id="replyText-{{ $item->id }}" placeholder="{{ __('Tulis balasan untuk ulasan ini...') }}">{{ $item->balasan_admin }}</textarea>
+                    <div class="reply-form-foot">
+                        <span class="reply-hint">{{ __('Balasan akan tampil di bawah ulasan dan bisa dilihat penyewa.') }}</span>
+                        <div class="reply-form-actions">
+                            <button class="btn-cancel" type="button" onclick="cancelReply({{ $item->id }})">{{ __('Batal') }}</button>
+                            <button class="btn-send" type="button" onclick="sendReply({{ $item->id }})" id="btnSend-{{ $item->id }}">
+                                {{ $item->sudah_dibalas ? __('Simpan Balasan') : __('Kirim Balasan') }}
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <span class="stars">★★★★★</span>
-            </div>
-            <p class="review-body">{{ __('Jujur tidur disini bikin ga capek, pokok nyaman deh, makasih yaa. kalau bisa disini lagi ya kesini lagi wes pokoknya') }}</p>
 
-            <div class="reply-form" id="replyForm-1">
-                <textarea class="reply-textarea" id="replyText-1" placeholder="{{ __('Tulis balasan untuk ulasan ini...') }}"></textarea>
-                <div class="reply-form-foot">
-                    <span class="reply-hint">{{ __('Balasan akan tampil di bawah ulasan dan bisa dilihat penyewa.') }}</span>
-                    <div class="reply-form-actions">
-                        <button class="btn-cancel" type="button" onclick="cancelReply(1)">{{ __('Batal') }}</button>
-                        <button class="btn-send" type="button" onclick="sendReply(1)">{{ __('Kirim Balasan') }}</button>
-                    </div>
+                {{-- Action buttons --}}
+                <div class="review-actions" id="reviewActions-{{ $item->id }}">
+                    @if($item->sudah_dibalas)
+                        <button class="btn-replied" disabled>{{ __('Sudah dibalas') }}</button>
+                        <button class="link-edit" type="button" onclick="openReply({{ $item->id }})">{{ __('Ubah balasan') }}</button>
+                    @else
+                        <button class="btn-respon" type="button" onclick="openReply({{ $item->id }})">{{ __('Beri respon') }}</button>
+                    @endif
+                    <button class="btn-hapus" type="button" onclick="hapusUlasan({{ $item->id }})">{{ __('Hapus') }}</button>
                 </div>
             </div>
-
-            <div class="review-actions" id="reviewActions-1">
-                <button class="btn-respon" type="button" onclick="openReply(1)">{{ __('Beri respon') }}</button>
+        @empty
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3l2.5 6.5H21l-5.2 4 2 6.5L12 16.5 6.2 20l2-6.5L3 9.5h6.5L12 3z"/>
+                </svg>
+                <h3>{{ __('Belum ada ulasan') }}</h3>
+                <p>{{ __('Ulasan dari penyewa akan muncul di sini setelah mereka menginap dan memberi rating.') }}</p>
             </div>
-        </div>
+        @endforelse
 
-        {{-- Ulasan 2 - sudah dibalas --}}
-        <div class="review" id="review-2">
-            <div class="review-top">
-                <div class="review-who">
-                    <img src="https://i.pravatar.cc/64?img=22" alt="">
-                    <div>
-                        <div class="rname">@siimutmanis</div>
-                        <div class="rmeta">{{ __('Villa Batu, Malang') }} · {{ __('Satu Rumah (Sewa Rumah)') }} · {{ __('4 hari lalu') }}</div>
-                    </div>
-                </div>
-                <span class="stars">★★★★★</span>
+        @if($ulasan->hasPages())
+            <div class="pagination-wrap">
+                {{ $ulasan->withQueryString()->links() }}
             </div>
-            <p class="review-body">{{ __('Jujur tidur disini bikin ga capek, pokok nyaman deh, makasih yaa. kalau bisa disini lagi ya kesini lagi wes pokoknya') }}</p>
-
-            <div class="review-reply" id="replyBox-2">
-                <div class="rr-badge">HT</div>
-                <div class="rr-body">
-                    <span class="rr-title">{{ __('Balasan Anda') }}</span>
-                    <span class="rr-text">{{ __('Terima kasih banyak ulasannya, kami tunggu kunjungan berikutnya ya!') }}</span>
-                </div>
-            </div>
-
-            <div class="reply-form" id="replyForm-2">
-                <textarea class="reply-textarea" id="replyText-2" placeholder="{{ __('Tulis balasan untuk ulasan ini...') }}">{{ __('Terima kasih banyak ulasannya, kami tunggu kunjungan berikutnya ya!') }}</textarea>
-                <div class="reply-form-foot">
-                    <span class="reply-hint">{{ __('Mengubah balasan akan menggantikan balasan sebelumnya.') }}</span>
-                    <div class="reply-form-actions">
-                        <button class="btn-cancel" type="button" onclick="cancelReply(2)">{{ __('Batal') }}</button>
-                        <button class="btn-send" type="button" onclick="sendReply(2)">{{ __('Simpan Balasan') }}</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="review-actions" id="reviewActions-2">
-                <button class="btn-replied" disabled>{{ __('Sudah dibalas') }}</button>
-                <button class="link-edit" type="button" onclick="openReply(2)">{{ __('Ubah balasan') }}</button>
-            </div>
-        </div>
-
-        {{-- Ulasan 3 - belum dibalas --}}
-        <div class="review" id="review-3">
-            <div class="review-top">
-                <div class="review-who">
-                    <img src="https://i.pravatar.cc/64?img=23" alt="">
-                    <div>
-                        <div class="rname">@ekaramadanisetiawan</div>
-                        <div class="rmeta">{{ __('Kost Tulungagung') }} · {{ __('Kamar Keluarga (Sewa Kamar)') }} · {{ __('1 minggu lalu') }}</div>
-                    </div>
-                </div>
-                <span class="stars">★★★★★</span>
-            </div>
-            <p class="review-body">{{ __('Jujur tidur disini bikin ga capek, pokok nyaman deh, makasih yaa. kalau bisa disini lagi ya kesini lagi wes pokoknya') }}</p>
-
-            <div class="reply-form" id="replyForm-3">
-                <textarea class="reply-textarea" id="replyText-3" placeholder="{{ __('Tulis balasan untuk ulasan ini...') }}"></textarea>
-                <div class="reply-form-foot">
-                    <span class="reply-hint">{{ __('Balasan akan tampil di bawah ulasan dan bisa dilihat penyewa.') }}</span>
-                    <div class="reply-form-actions">
-                        <button class="btn-cancel" type="button" onclick="cancelReply(3)">{{ __('Batal') }}</button>
-                        <button class="btn-send" type="button" onclick="sendReply(3)">{{ __('Kirim Balasan') }}</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="review-actions" id="reviewActions-3">
-                <button class="btn-respon" type="button" onclick="openReply(3)">{{ __('Beri respon') }}</button>
-            </div>
-        </div>
+        @endif
     </div>
 </div>
 
 {{-- ============================================================
-     TAB 2: PESAN KONTAK
+     TAB 2: PESAN KONTAK (SUDAH BACKEND)
      ============================================================ --}}
 <div class="tab-content" id="tab-pesan">
     <div class="panel ulasan-panel">
@@ -835,6 +771,8 @@
 
 @section('scripts')
 <script>
+    const CSRF = document.querySelector('meta[name="csrf-token"]')?.content;
+
     // ===== TABS =====
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -858,31 +796,86 @@
         document.getElementById('reviewActions-' + id).style.display = 'flex';
     }
 
-    function sendReply(id) {
-        const text = document.getElementById('replyText-' + id).value.trim();
-        if (!text) return;
-
-        let replyBox = document.getElementById('replyBox-' + id);
-        if (!replyBox) {
-            replyBox = document.createElement('div');
-            replyBox.className = 'review-reply';
-            replyBox.id = 'replyBox-' + id;
-            replyBox.innerHTML = '<div class="rr-badge">HT</div><div class="rr-body"><span class="rr-title">{{ __("Balasan Anda") }}</span><span class="rr-text"></span></div>';
-            const form = document.getElementById('replyForm-' + id);
-            form.parentNode.insertBefore(replyBox, form);
+    async function sendReply(id) {
+        const textarea = document.getElementById('replyText-' + id);
+        const text = textarea.value.trim();
+        if (!text) {
+            alert('{{ __("Balasan tidak boleh kosong.") }}');
+            return;
         }
-        replyBox.querySelector('.rr-text').textContent = text;
 
-        document.getElementById('replyForm-' + id).classList.remove('open');
+        const btn = document.getElementById('btnSend-' + id);
+        if (btn) { btn.disabled = true; btn.textContent = '{{ __("Mengirim...") }}'; }
 
-        const actions = document.getElementById('reviewActions-' + id);
-        actions.innerHTML = '<button class="btn-replied" disabled>{{ __("Sudah dibalas") }}</button><button class="link-edit" type="button" onclick="openReply(' + id + ')">{{ __("Ubah balasan") }}</button>';
-        actions.style.display = 'flex';
+        try {
+            const res = await fetch(`/admin/ulasan/${id}/reply`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': CSRF,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ balasan_admin: text }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                // Update atau buat kotak balasan
+                let replyBox = document.getElementById('replyBox-' + id);
+                if (!replyBox) {
+                    replyBox = document.createElement('div');
+                    replyBox.className = 'review-reply';
+                    replyBox.id = 'replyBox-' + id;
+                    replyBox.innerHTML = '<div class="rr-badge">HT</div><div class="rr-body"><span class="rr-title">{{ __("Balasan Anda") }}</span><span class="rr-text"></span></div>';
+                    const form = document.getElementById('replyForm-' + id);
+                    form.parentNode.insertBefore(replyBox, form);
+                }
+                replyBox.querySelector('.rr-text').textContent = data.balasan;
+
+                // Sembunyikan form
+                document.getElementById('replyForm-' + id).classList.remove('open');
+
+                // Update action buttons
+                const actions = document.getElementById('reviewActions-' + id);
+                actions.innerHTML = `
+                    <button class="btn-replied" disabled>{{ __("Sudah dibalas") }}</button>
+                    <button class="link-edit" type="button" onclick="openReply(${id})">{{ __("Ubah balasan") }}</button>
+                    <button class="btn-hapus" type="button" onclick="hapusUlasan(${id})">{{ __("Hapus") }}</button>
+                `;
+                actions.style.display = 'flex';
+
+                // Reset tombol
+                if (btn) { btn.disabled = false; btn.textContent = '{{ __("Simpan Balasan") }}'; }
+            } else {
+                alert('{{ __("Gagal menyimpan balasan.") }}');
+                if (btn) { btn.disabled = false; btn.textContent = '{{ __("Kirim Balasan") }}'; }
+            }
+        } catch (e) {
+            console.error(e);
+            alert('{{ __("Terjadi kesalahan.") }}');
+            if (btn) { btn.disabled = false; btn.textContent = '{{ __("Kirim Balasan") }}'; }
+        }
+    }
+
+    async function hapusUlasan(id) {
+        if (!confirm('{{ __("Yakin ingin menghapus ulasan ini? Ulasan tidak akan tampil di halaman publik.") }}')) return;
+
+        try {
+            const res = await fetch(`/admin/ulasan/${id}`, {
+                method: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+            });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('review-' + id)?.remove();
+            }
+        } catch (e) {
+            console.error(e);
+            alert('{{ __("Gagal menghapus ulasan.") }}');
+        }
     }
 
     // ===== PESAN KONTAK AJAX =====
-    const CSRF = document.querySelector('meta[name="csrf-token"]')?.content;
-
     async function markAsRead(id) {
         try {
             const res = await fetch(`/admin/kontak/${id}/read`, {

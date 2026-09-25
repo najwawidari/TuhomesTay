@@ -1,30 +1,21 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Kolom `harga_rumah_mid`, `gambar_utama`, dan `gallery` sudah
+     * ditambahkan di migration 2026_09_19_104122_create_kamars_table.php.
+     * Migration ini hanya placeholder supaya urutan migration tetap konsisten.
+     */
     public function up(): void
     {
-        Schema::table('kamars', function (Blueprint $table) {
-            if (!Schema::hasColumn('kamars', 'harga_rumah_mid')) {
-                $table->integer('harga_rumah_mid')->nullable()->after('harga_kamar');
-            }
-            if (!Schema::hasColumn('kamars', 'gambar_utama')) {
-                $table->string('gambar_utama')->nullable()->after('keterangan');
-            }
-            if (!Schema::hasColumn('kamars', 'gallery')) {
-                $table->json('gallery')->nullable()->after('gambar_utama');
-            }
-        });
+        // No-op
     }
 
     public function down(): void
     {
-        Schema::table('kamars', function (Blueprint $table) {
-            $table->dropColumn(['harga_rumah_mid', 'gambar_utama', 'gallery']);
-        });
+        // No-op
     }
 };

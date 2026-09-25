@@ -1,5 +1,4 @@
 @php
-    // $errors dan $old dikirim dari AuthController@showRegister
     $errors = $errors ?? [];
     $old    = $old ?? ['fullname' => '', 'email' => '', 'phone' => ''];
 @endphp
@@ -10,6 +9,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Buat Akun - TuhomesTay</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
   :root{
     --brown-dark:#3a2a1e;
@@ -41,6 +41,7 @@
     padding:12px 0; border-radius:50px; border:1.5px solid var(--brown-dark);
     background:var(--input-bg); color:var(--brown-dark); font-size:13.5px; font-weight:600; cursor:pointer;
     transition:background .15s ease, transform .15s ease;
+    text-decoration:none;
   }
   .social-btn:hover{ background:#f2f0ee; transform:translateY(-1px); }
   .social-btn svg{ width:18px; height:18px; flex:none; }
@@ -124,8 +125,61 @@
 
   .mobile-view{ display:none; }
 
+  /* ===== TOAST ===== */
+  .toast-container {
+    position: fixed; top: 20px; right: 20px; z-index: 99999;
+    display: flex; flex-direction: column; gap: 12px;
+    max-width: 380px; pointer-events: none;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  .toast {
+    background: #FFFFFF; border-radius: 14px; padding: 14px 18px;
+    box-shadow: 0 10px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+    display: flex; align-items: flex-start; gap: 12px;
+    border-left: 5px solid #7B5E4A;
+    transform: translateX(120%); opacity: 0;
+    animation: toastIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    pointer-events: auto;
+    position: relative; overflow: hidden;
+  }
+  .toast.removing { animation: toastOut 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+  @keyframes toastIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes toastOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
+  .toast.success { border-left-color: #2E9E42; }
+  .toast.error   { border-left-color: #D64545; }
+  .toast.warning { border-left-color: #F0B429; }
+  .toast.info    { border-left-color: #3B82F6; }
+  .toast-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 0.95rem; color: #fff;
+  }
+  .toast.success .toast-icon { background: #2E9E42; }
+  .toast.error   .toast-icon { background: #D64545; }
+  .toast.warning .toast-icon { background: #F0B429; }
+  .toast.info    .toast-icon { background: #3B82F6; }
+  .toast-body { flex: 1; min-width: 0; }
+  .toast-title { font-size: 0.875rem; font-weight: 700; color: #2B2320; margin-bottom: 2px; }
+  .toast-message { font-size: 0.8rem; color: #7B5E4A; line-height: 1.45; word-wrap: break-word; }
+  .toast-close {
+    background: none; border: none; color: #9C948A; cursor: pointer;
+    width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; font-size: 0.8rem; flex-shrink: 0;
+  }
+  .toast-close:hover { background: #F1F1F1; color: #3B2A20; }
+  .toast-progress {
+    position: absolute; bottom: 0; left: 0; height: 3px; width: 100%;
+    transform-origin: left; animation: toastProgress linear forwards;
+  }
+  .toast.success .toast-progress { background: #2E9E42; }
+  .toast.error   .toast-progress { background: #D64545; }
+  .toast.warning .toast-progress { background: #F0B429; }
+  .toast.info    .toast-progress { background: #3B82F6; }
+  @keyframes toastProgress { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
   @media (max-width:560px){
     .desktop-view{ display:none; }
+    .toast-container { top: auto; bottom: 20px; left: 16px; right: 16px; max-width: none; }
 
     .mobile-view{
       display:block;
@@ -232,6 +286,9 @@
 </head>
 <body>
 
+  <!-- ============ TOAST CONTAINER ============ -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <!-- ============ DESKTOP / LAPTOP ============ -->
   <div class="desktop-view">
     <div class="card">
@@ -289,14 +346,14 @@
       <div class="divider"><span>atau</span></div>
 
       <div class="social-buttons">
-        <button type="button" class="social-btn" id="googleSignupD">
+        <a href="{{ route('auth.google') }}?from=register" class="social-btn" id="googleSignupD">
           <svg viewBox="0 0 20 20"><path fill="#4285F4" d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z"/><path fill="#34A853" d="M10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45c-.87.59-2.01.94-3.46.94-2.66 0-4.9-1.79-5.71-4.2H1.02v2.53C2.68 17.75 6.09 20 10 20z"/><path fill="#FBBC05" d="M4.29 11.87c-.2-.59-.31-1.22-.31-1.87s.11-1.28.31-1.87V5.6H1.02A9.97 9.97 0 0 0 0 10c0 1.61.39 3.14 1.02 4.4l3.27-2.53z"/><path fill="#EA4335" d="M10 3.96c1.47 0 2.79.5 3.83 1.49l2.87-2.87C14.95.99 12.7 0 10 0 6.09 0 2.68 2.25 1.02 5.6l3.27 2.53C5.1 5.75 7.34 3.96 10 3.96z"/></svg>
           Daftar dengan Google
-        </button>
-        <button type="button" class="social-btn" id="facebookSignupD">
+        </a>
+        <a href="#" class="social-btn" id="facebookSignupD" onclick="alert('Facebook OAuth belum dikonfigurasi.'); return false;">
           <svg viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
           Daftar dengan Facebook
-        </button>
+        </a>
       </div>
 
       <div class="switch-link">
@@ -378,14 +435,14 @@
         <div class="divider"><span>atau</span></div>
 
         <div class="social-buttons">
-          <button type="button" class="social-btn" id="googleSignupM">
+          <a href="{{ route('auth.google') }}?from=register" class="social-btn" id="googleSignupM">
             <svg viewBox="0 0 20 20"><path fill="#4285F4" d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z"/><path fill="#34A853" d="M10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45c-.87.59-2.01.94-3.46.94-2.66 0-4.9-1.79-5.71-4.2H1.02v2.53C2.68 17.75 6.09 20 10 20z"/><path fill="#FBBC05" d="M4.29 11.87c-.2-.59-.31-1.22-.31-1.87s.11-1.28.31-1.87V5.6H1.02A9.97 9.97 0 0 0 0 10c0 1.61.39 3.14 1.02 4.4l3.27-2.53z"/><path fill="#EA4335" d="M10 3.96c1.47 0 2.79.5 3.83 1.49l2.87-2.87C14.95.99 12.7 0 10 0 6.09 0 2.68 2.25 1.02 5.6l3.27 2.53C5.1 5.75 7.34 3.96 10 3.96z"/></svg>
             Daftar dengan Google
-          </button>
-          <button type="button" class="social-btn" id="facebookSignupM">
+          </a>
+          <a href="#" class="social-btn" id="facebookSignupM" onclick="alert('Facebook OAuth belum dikonfigurasi.'); return false;">
             <svg viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
             Daftar dengan Facebook
-          </button>
+          </a>
         </div>
 
         <p class="switch-m">Sudah punya akun? <a href="{{ route('login') }}">Masuk di sini</a></p>
@@ -398,6 +455,58 @@
   </div>
 
 <script>
+  // ===== TOAST SYSTEM =====
+  window.showToast = function(type, title, message, duration) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    duration = duration || 4500;
+    const iconMap = { success:'fa-circle-check', error:'fa-circle-xmark', warning:'fa-triangle-exclamation', info:'fa-circle-info' };
+    const icon = iconMap[type] || iconMap.info;
+
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = `
+      <div class="toast-icon"><i class="fa-solid ${icon}"></i></div>
+      <div class="toast-body">
+        <div class="toast-title">${title}</div>
+        <div class="toast-message">${message}</div>
+      </div>
+      <button type="button" class="toast-close" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      <div class="toast-progress"></div>
+    `;
+    container.appendChild(toast);
+    const progress = toast.querySelector('.toast-progress');
+    progress.style.animationDuration = duration + 'ms';
+
+    const remove = () => {
+      toast.classList.add('removing');
+      setTimeout(() => toast.remove(), 350);
+    };
+    toast.querySelector('.toast-close').addEventListener('click', remove);
+    setTimeout(remove, duration);
+  };
+
+  // ===== TAMPILKAN TOAST UNTUK FLASH MESSAGE & ERRORS =====
+  document.addEventListener('DOMContentLoaded', function () {
+    @if(session('success'))
+      window.showToast('success', 'Berhasil!', @json(session('success')), 4500);
+    @endif
+    @if(session('error'))
+      window.showToast('error', 'Gagal!', @json(session('error')), 5000);
+    @endif
+    @if(session('warning'))
+      window.showToast('warning', 'Perhatian', @json(session('warning')), 4500);
+    @endif
+    @if(session('info'))
+      window.showToast('info', 'Info', @json(session('info')), 4000);
+    @endif
+    @if(!empty($errors) && !session('success') && !session('error'))
+      @php $errText = collect(array_values($errors))->take(3)->implode(' • '); @endphp
+      window.showToast('error', 'Ada kesalahan', @json($errText), 6000);
+    @endif
+  });
+
+  // ===== TOGGLE EYE =====
   document.querySelectorAll('.toggle-eye').forEach(btn => {
     btn.addEventListener('click', () => {
       const input = btn.closest('.field-m').querySelector('input');
@@ -405,6 +514,7 @@
     });
   });
 
+  // ===== VALIDASI FORM =====
   function invalidateField(field, invalid){
     if (!field) return;
     field.classList.toggle('show-hint', invalid);
@@ -449,17 +559,6 @@
         btn.disabled = true;
         btn.textContent = 'memproses...';
       }
-    });
-  });
-
-  ['googleSignupD', 'googleSignupM'].forEach(id => {
-    document.getElementById(id)?.addEventListener('click', () => {
-      alert('Hubungkan tombol ini dengan Google OAuth Anda.');
-    });
-  });
-  ['facebookSignupD', 'facebookSignupM'].forEach(id => {
-    document.getElementById(id)?.addEventListener('click', () => {
-      alert('Hubungkan tombol ini dengan Facebook OAuth Anda.');
     });
   });
 </script>

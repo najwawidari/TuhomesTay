@@ -116,18 +116,19 @@
         </div>
         <div class="bside">
           @php
-            $statusBooking = $b->status_booking ?? $b->status ?? 'pending';
+            $statusBooking = $b->display_status;
             $pillClass = match($statusBooking) {
               'pending' => 'wait',
               'dibayar' => 'confirmed',
+              'selesai' => 'confirmed',
               'batal'   => 'offline',
               'expired' => 'done',
               default   => 'done',
             };
           @endphp
-          <span class="pill {{ $pillClass }}">{{ $b->status_label ?? ucfirst($statusBooking) }}</span>
-          @if(in_array($statusBooking, ['pending', 'dibayar']))
-            <button class="btn-cancel" type="button" onclick="return confirm('{{ __('Batalkan pesanan ini?') }}')">{{ __('Batalkan') }}</button>
+          <span class="pill {{ $pillClass }}">{{ $b->display_status_label }}</span>
+          @if($b->bisa_dibatalkan)
+            <a class="btn-cancel" href="{{ url('/admin/reservasi') }}#{{ $b->kode_booking }}">{{ __('Kelola') }}</a>
           @endif
         </div>
       </div>
@@ -137,49 +138,53 @@
   </div>
 </div>
 
-{{-- Ulasan Terbaru --}}
+{{-- Ulasan Terbaru (SEKARANG BACKEND!) --}}
 <div class="panel ulasan" style="margin-bottom:14px;">
   <div class="panel-head">
     <div>
       <h2>{{ __('Ulasan Terbaru') }}</h2>
-      <p class="panel-sub">{{ __('Rata-rata 4.9 dari 5 ulasan bulan ini') }}</p>
+      <p class="panel-sub">
+        @if($ratingRingkasan['total'] > 0)
+          {{ __('Rata-rata') }} {{ number_format($ratingRingkasan['overall'], 1) }} {{ __('dari') }} {{ $ratingRingkasan['total'] }} {{ __('ulasan') }}
+        @else
+          {{ __('Belum ada ulasan bulan ini') }}
+        @endif
+      </p>
     </div>
     <a href="{{ url('/admin/ulasan-pesan') }}" class="badge-brown">{{ __('Kelola Ulasan & Pesan') }}</a>
   </div>
 
-  <div class="cat-summary">
-    <div class="cat-item"><span>{{ __('Kebersihan') }}</span><b>5.0</b></div>
-    <div class="cat-item"><span>{{ __('Kemudahan') }}</span><b>5.0</b></div>
-    <div class="cat-item"><span>{{ __('Kenyamanan') }}</span><b>5.0</b></div>
-    <div class="cat-item"><span>{{ __('Harga') }}</span><b>5.0</b></div>
-    <div class="cat-item"><span>{{ __('Fasilitas Kamar') }}</span><b>5.0</b></div>
-    <div class="cat-item"><span>{{ __('Pelayanan Pemilik') }}</span><b>4.8</b></div>
-  </div>
+  @if($ratingRingkasan['total'] > 0)
+    <div class="cat-summary">
+      <div class="cat-item"><span>{{ __('Kebersihan') }}</span><b>{{ number_format($ratingRingkasan['kebersihan'], 1) }}</b></div>
+      <div class="cat-item"><span>{{ __('Kenyamanan') }}</span><b>{{ number_format($ratingRingkasan['kenyamanan'], 1) }}</b></div>
+      <div class="cat-item"><span>{{ __('Fasilitas Kamar') }}</span><b>{{ number_format($ratingRingkasan['fasilitas'], 1) }}</b></div>
+      <div class="cat-item"><span>{{ __('Pelayanan Pemilik') }}</span><b>{{ number_format($ratingRingkasan['pelayanan'], 1) }}</b></div>
+    </div>
+  @endif
 
-  <div class="review">
-    <div class="review-top">
-      <span class="rname">@nanan_wiwawi</span>
-      <span class="stars">★★★★★</span>
+  @forelse($ulasanTerbaru as $u)
+    @php
+      $bintang = str_repeat('★', (int) $u->rating_overall) . str_repeat('☆', 5 - (int) $u->rating_overall);
+    @endphp
+    <div class="review">
+      <div class="review-top">
+        <span class="rname">{{ $u->nama_penyewa }}</span>
+        <span class="stars">{{ $bintang }}</span>
+      </div>
+      <p class="review-body">{{ $u->komentar ?? '-' }}</p>
+      <a class="btn-respon" href="{{ url('/admin/ulasan-pesan') }}" style="text-decoration:none;display:inline-block;">
+        {{ $u->sudah_dibalas ? __('Lihat balasan') : __('Beri respon') }}
+      </a>
     </div>
-    <p class="review-body">{{ __('Jujur tidur disini bikin ga capek, pokok nyaman deh, makasih yaa. kalau bisa disini lagi ya kesini lagi wes pokoknya') }}</p>
-    <button class="btn-respon" type="button">{{ __('Beri respon') }}</button>
-  </div>
-  <div class="review">
-    <div class="review-top">
-      <span class="rname">@siimutmanis</span>
-      <span class="stars">★★★★★</span>
+  @empty
+    <div style="text-align:center; padding:30px 20px; color:var(--ink-soft); font-size:13px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:40px;height:40px;opacity:0.3;margin-bottom:8px;">
+        <path d="M12 3l2.5 6.5H21l-5.2 4 2 6.5L12 16.5 6.2 20l2-6.5L3 9.5h6.5L12 3z"/>
+      </svg>
+      <p>{{ __('Belum ada ulasan dari penyewa.') }}</p>
     </div>
-    <p class="review-body">{{ __('Jujur tidur disini bikin ga capek, pokok nyaman deh, makasih yaa. kalau bisa disini lagi ya kesini lagi wes pokoknya') }}</p>
-    <button class="btn-respon" type="button">{{ __('Beri respon') }}</button>
-  </div>
-  <div class="review">
-    <div class="review-top">
-      <span class="rname">@ekaramadanisetiawan</span>
-      <span class="stars">★★★★★</span>
-    </div>
-    <p class="review-body">{{ __('Jujur tidur disini bikin ga capek, pokok nyaman deh, makasih yaa. kalau bisa disini lagi ya kesini lagi wes pokoknya') }}</p>
-    <button class="btn-respon" type="button">{{ __('Beri respon') }}</button>
-  </div>
+  @endforelse
 </div>
 
 {{-- Data Pengguna --}}
@@ -255,9 +260,9 @@
                 {{ $u->alamat_asal ?? $u->kota ?? '-' }}
               </div>
             </td>
-            <td class="riwayat">{{ $u->total_booking ?? 0 }} {{ __('pemesanan') }} <span>· {{ __('terakhir') }} {{ optional($u->last_booking_at)->format('d F Y') ?? '-' }}</span></td>
+            <td class="riwayat">{{ $u->booking()->count() ?? 0 }} {{ __('pemesanan') }} <span>· {{ __('terakhir') }} {{ optional($u->updated_at)->format('d F Y') ?? '-' }}</span></td>
             <td><span class="status"><i class="dot-sm on"></i>{{ __('Aktif') }}</span></td>
-          <td><a class="detail-link" href="{{ route('admin.pengguna.show', $u->id) }}">{{ __('Detail') }}</a></td>
+            <td><a class="detail-link" href="{{ route('admin.pengguna.show', $u->id) }}">{{ __('Detail') }}</a></td>
           </tr>
         @empty
           <tr>
@@ -282,7 +287,7 @@
       <label for="ofProperti">{{ __('Properti') }}</label>
       <select id="ofProperti">
         @foreach($kamars ?? [] as $p)
-          <option>{{ $p->nama_kamar }} ({{ $p->cabang === 'batu' ? 'Batu, Punten' : 'Tulungagung' }})</option>
+          <option value="{{ $p->id }}">{{ $p->nama_kamar }} ({{ $p->cabang === 'batu' ? 'Batu, Punten' : 'Tulungagung' }})</option>
         @endforeach
       </select>
     </div>
@@ -296,9 +301,54 @@
     </div>
     <div class="modal-actions">
       <button class="btn-plain" type="button" onclick="document.getElementById('modalOffline').classList.remove('open')">{{ __('Batal') }}</button>
-      <button class="btn-solid" type="button" onclick="document.getElementById('modalOffline').classList.remove('open')">{{ __('Simpan Pesanan') }}</button>
+      <button class="btn-solid" type="button" onclick="simpanOffline()">{{ __('Simpan Pesanan') }}</button>
     </div>
   </div>
 </div>
 
+@endsection
+
+@section('scripts')
+<script>
+  const CSRF = document.querySelector('meta[name="csrf-token"]')?.content;
+
+  async function simpanOffline() {
+    const nama     = document.getElementById('ofName').value.trim();
+    const kamarId  = document.getElementById('ofProperti').value;
+    const checkin  = document.getElementById('ofCheckin').value;
+    const total    = document.getElementById('ofTotal').value;
+
+    if (!nama || !kamarId || !checkin || !total) {
+      alert('{{ __("Semua field harus diisi.") }}');
+      return;
+    }
+
+    try {
+      const res = await fetch("{{ route('admin.reservasi.offline') }}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': CSRF,
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          nama_penyewa: nama,
+          id_kamar: kamarId,
+          tanggal_checkin: checkin,
+          total_bayar: total,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('{{ __("Pesanan offline berhasil disimpan.") }}');
+        location.reload();
+      } else {
+        alert(data.message || '{{ __("Gagal menyimpan.") }}');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('{{ __("Terjadi kesalahan.") }}');
+    }
+  }
+</script>
 @endsection

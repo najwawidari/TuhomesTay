@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Booking;
+use App\Models\Invoice;
 
 class TransaksiController extends Controller
 {
@@ -62,33 +63,44 @@ class TransaksiController extends Controller
 
     public function bayar(Request $request, $kode)
     {
+        return app(\App\Http\Controllers\MidtransController::class)
+                    ->getSnapToken($request, $kode);
+    }
+
+    public function sukses($kode)
+    {
         $booking = Booking::where('kode_booking', $kode)->firstOrFail();
 
-        $paymentMethod = $request->input('payment_method', 'unknown');
-        $koinDipakai   = $request->boolean('koin_dipakai', false);
-
-        // Potongan koin: 3 koin x Rp 1.000 = Rp 3.000
-        $koinDipakaiVal = $koinDipakai ? 3 : 0;
-        $total = $booking->total_bayar;
-        if ($koinDipakai) {
-            $total = max(0, $total - 3000);
+        if ($booking->status_booking !== 'dibayar') {
+            $booking->update([
+                'status_booking' => 'dibayar',
+                'paid_at'        => now(),
+            ]);
         }
 
-        // Update booking
-        $booking->update([
-            'midtrans_order_id' => 'ORDER-' . $booking->kode_booking,
-            'koin_digunakan'    => $koinDipakaiVal,
-        ]);
+        // Buat invoice otomatis (sesuai struktur tabel yang benar)
+        $invoice = Invoice::where('id_booking', $booking->id)->first();
 
-        return response()->json([
-            'success'        => true,
-            'order_id'       => $booking->midtrans_order_id,
-            'snap_token'     => $booking->midtrans_token,
-            'payment_method' => $paymentMethod,
-            'koin_dipakai'   => $koinDipakai,
-            'total_bayar'    => $total,
-            'message'        => 'Midtrans belum dikonfigurasi. Placeholder OK.',
-        ]);
+        if (!$invoice) {
+            Invoice::create([
+                'id_booking'        => $booking->id,
+                'id_penyewa'        => $booking->id_penyewa,
+                'metode_pembayaran' => 'midtrans',
+                'tg_transaksi'      => now(),
+                'checkin'           => $booking->tanggal_checkin,
+                'checkout'          => $booking->tanggal_checkout,
+                'koin_digunakan'    => $booking->koin_digunakan ?? 0,
+                'total_bayar'       => $booking->total_bayar,
+                'status'            => 'lunas',
+            ]);
+        } else {
+            $invoice->update([
+                'status'       => 'lunas',
+                'tg_transaksi' => now(),
+            ]);
+        }
+
+        return view('transaksi-sukses', compact('booking'));
     }
 
     public function status($kode)

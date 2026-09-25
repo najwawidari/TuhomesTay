@@ -8,20 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('bookings')) {
+            return;
+        }
+
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->string('kode_booking', 30)->unique();
-
-            // FK
             $table->unsignedBigInteger('id_penyewa')->nullable();
             $table->unsignedBigInteger('id_kamar');
-
-            // Data utama booking
             $table->decimal('total_bayar', 14, 2)->default(0);
             $table->integer('koin_digunakan')->default(0);
             $table->enum('status_booking', ['pending', 'dibayar', 'batal', 'expired'])->default('pending');
-
-            // Data penyewa
             $table->string('nama_penyewa', 100);
             $table->string('no_hp', 20);
             $table->string('asal', 100)->nullable();
@@ -34,12 +32,9 @@ return new class extends Migration
             $table->integer('dewasa')->default(1);
             $table->integer('anak')->default(0);
             $table->text('pesan')->nullable();
-
-            // Midtrans
             $table->string('midtrans_order_id')->nullable();
             $table->string('midtrans_token')->nullable();
             $table->timestamp('paid_at')->nullable();
-
             $table->timestamps();
 
             $table->index('id_penyewa');

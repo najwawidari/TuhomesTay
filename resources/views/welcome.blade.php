@@ -1,7 +1,6 @@
 @php
-    $currentUser = session('user') ?? null;
+    $currentUser = auth()->user();
     $isLoggedIn  = $currentUser !== null;
-    $userPhoto   = $currentUser['photo'] ?? null;
 @endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
@@ -74,7 +73,6 @@
             gap: clamp(6px, 1.1vw, 11px); flex-shrink: 0;
         }
 
-        /* ===== EN | ID language switch ===== */
         .lang-switch {
             display: flex; align-items: center; gap: 4px;
             font-family: 'Poppins', sans-serif;
@@ -96,7 +94,6 @@
         .lang-switch button:hover { opacity: 1; }
         .lang-switch .lang-sep { opacity: 0.5; }
 
-        /* ===== SEARCH ===== */
         .nav-search {
             display: flex; align-items: center; gap: 6px;
             background-color: transparent;
@@ -148,15 +145,23 @@
             display: flex; transition: all 0.2s ease;
         }
         .nav-daftar-btn:hover { background-color: #3B2A20; color: #fff; }
+
         .navbar-avatar {
-            width: clamp(32px, 3.4vw, 38px); height: clamp(32px, 3.4vw, 38px);
+            width: clamp(34px, 3.4vw, 40px); height: clamp(34px, 3.4vw, 40px);
             border-radius: 50%; background-color: #F2E7D5;
             border: 2px solid #3B2A20; display: flex;
             align-items: center; justify-content: center; padding: 2px;
-            text-decoration: none; transition: transform 0.2s ease;
-            flex-shrink: 0; overflow: hidden;
+            text-decoration: none; flex-shrink: 0; overflow: hidden;
+            font-family: 'Poppins', sans-serif; font-weight: 700;
+            font-size: clamp(0.78rem, 0.95vw, 0.88rem);
+            color: #3B2A20; letter-spacing: 0.5px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .navbar-avatar:hover { transform: scale(1.05); }
+        .nav-wrap.scrolled .navbar-avatar { border-color: #7B5E4A; }
+        .navbar-avatar:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(59,42,32,0.25);
+        }
         .navbar-avatar img {
             width: 100%; height: 100%; border-radius: 50%;
             object-fit: cover; display: block;
@@ -165,8 +170,8 @@
             width: 100%; height: 100%; border-radius: 50%;
             background-color: #F2E7D5; color: #3B2A20;
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.9rem;
         }
+
         .logo-container { display: flex; align-items: center; text-decoration: none; }
         .logo-image { height: clamp(28px, 3.2vw, 38px); width: auto; display: block; }
         .nav-links {
@@ -270,7 +275,6 @@
             width: 22px; border-radius: 10px; background: #fff;
         }
 
-        /* ===== WHATSAPP ===== */
         .whatsapp-section {
             background: linear-gradient(105deg, #F2E7D5 0%, #F5ECDD 28%, #F8F2E9 55%, #FBF8F4 78%, #FAF7F0 100%);
             min-height: 100svh; padding: clamp(48px, 6vw, 80px) 0;
@@ -341,9 +345,9 @@
             background-color: #fff; color: #3B2A20;
         }
 
-        /* ===== MAP ===== */
+        /* ===== MAP SECTION ===== */
         .map-section {
-            position: relative; width: 100%; min-height: 100svh; height: 100svh;
+            position: relative; width: 100%; height: 80vh; min-height: 520px;
             background: #D1B89A; overflow: hidden;
         }
         .map-section iframe {
@@ -353,8 +357,8 @@
         .map-section::before {
             content: ''; position: absolute; inset: 0; z-index: 1;
             pointer-events: none;
-            background: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(102,102,102,0.5) 100%);
-            opacity: 0.8;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, rgba(102,102,102,0.3) 100%);
+            opacity: 0.75;
         }
         .map-overlay-content {
             position: relative; z-index: 2; display: flex; flex-direction: column;
@@ -389,37 +393,39 @@
             background: rgba(255,255,255,0.12); transform: translateY(-2px);
         }
 
-        /* ===== BRANCHES ===== */
+        /* ===== BRANCHES SECTION (1 halaman penuh) ===== */
         .branches-section {
             background: linear-gradient(135deg, #7B5E4A 0%, #D1B89A 48%, #7B5E4A 100%);
             min-height: 100svh;
-            padding: clamp(60px, 8vw, 100px) 20px clamp(80px, 10vw, 120px);
+            padding: 90px 20px;
             display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; position: relative;
         }
         .branch-logo {
-            width: 115px; height: 115px; object-fit: contain; margin-bottom: 10px;
-            border-radius: 0; background: transparent; padding: 0;
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+            margin: 0 0 16px 0;
             display: block;
         }
         .branches-section h2 {
             font-family: 'Poppins', sans-serif; font-weight: 600;
-            font-size: clamp(1.5rem, 2.8vw, 2.1rem); color: #FAF7F0; margin-bottom: 8px;
-            margin-top: 0;
+            font-size: clamp(1.5rem, 2.8vw, 2.1rem); color: #FAF7F0;
+            margin: 0 0 6px;
         }
         .branches-section > p {
-            font-family: 'Poppins', sans-serif; font-size: 0.9rem;
-            color: rgba(250,247,240,0.8); margin-bottom: 28px;
-            margin-top: 0;
+            font-family: 'Poppins', sans-serif; font-size: 0.88rem;
+            color: rgba(250,247,240,0.85);
+            margin: 0 0 22px;
         }
         .branch-buttons {
-            display: flex; flex-direction: column; gap: 14px;
+            display: flex; flex-direction: column; gap: 12px;
             width: 100%; max-width: 420px;
         }
         .branch-btn {
             display: flex; align-items: center; justify-content: space-between;
             background: rgba(250,247,240,0.95); color: #3B2A20;
-            padding: 16px 20px; border-radius: 14px; text-decoration: none;
+            padding: 14px 18px; border-radius: 14px; text-decoration: none;
             font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 0.9rem;
             transition: all 0.25s ease; box-shadow: 0 4px 14px rgba(0,0,0,0.12);
         }
@@ -429,55 +435,63 @@
         }
         .branch-btn > div { display: flex; align-items: center; gap: 12px; }
         .branch-icon {
-            width: 36px; height: 36px; border-radius: 50%;
+            width: 34px; height: 34px; border-radius: 50%;
             background: #7B5E4A; color: #FAF7F0;
-            display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
         }
 
-        /* ===== TESTIMONIAL ===== */
+        /* ===== TESTIMONIAL SECTION (1 halaman penuh) ===== */
         .testimonial-section {
             background: #F2E7D5;
-            padding: clamp(72px, 9vw, 110px) 20px clamp(60px, 8vw, 100px);
+            min-height: 100svh;
+            padding: 90px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
             position: relative;
             z-index: 1;
-        }
-        .testimonial-section::before {
-            content: '';
-            position: absolute;
-            top: calc(-1 * clamp(28px, 4vw, 52px));
-            left: 0;
-            width: 100%;
-            height: clamp(28px, 4vw, 52px);
-            background-color: #F2E7D5;
-            clip-path: ellipse(120% 100% at 50% 100%);
-            pointer-events: none;
         }
         .testimonial-section h2 {
             font-family: 'Poppins', sans-serif;
             font-weight: 600;
             font-size: clamp(1.5rem, 2.8vw, 2.1rem);
             color: #3B2A20;
-            margin-bottom: 28px;
+            margin: 0 auto 4px;
+            text-align: center;
         }
+
         .testimonial-single {
             max-width: 720px;
+            width: 100%;
             margin: 0 auto;
             position: relative;
             background: transparent;
             border: none;
-            padding: 12px 24px 24px;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
+
         .testimonial-quote-icon {
             display: block;
-            font-size: clamp(2.8rem, 5vw, 3.6rem);
-            color: #3B2A20;
-            opacity: 0.85;
-            margin: 0 auto 20px;
-            line-height: 1;
-            position: static;
+            width: 44px;
+            height: auto;
+            margin: 4px auto 8px;
+            object-fit: contain;
+            user-select: none;
+            pointer-events: none;
         }
-        .testimonial-track-wrap { overflow: hidden; }
+
+        .testimonial-track-wrap {
+            overflow: hidden;
+            width: 100%;
+            margin: 0 auto;
+            transition: height 0.3s ease;
+        }
         .testimonial-track {
             display: flex;
             transition: transform 0.45s ease;
@@ -485,22 +499,26 @@
         .testimonial-slide {
             min-width: 100%;
             padding: 0 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
         .testimonial-quote-text {
             font-family: 'Poppins', sans-serif;
             font-size: clamp(0.95rem, 1.3vw, 1.1rem);
             line-height: 1.75;
             color: #3B2A20;
-            margin-bottom: 22px;
+            margin: 0 auto 18px;
             max-width: 580px;
-            margin-left: auto;
-            margin-right: auto;
+            text-align: center;
         }
         .testimonial-single-name {
             font-family: 'Poppins', sans-serif;
             font-weight: 700;
             font-size: 0.95rem;
             color: #3B2A20;
+            text-align: center;
         }
         .testimonial-single-role {
             font-family: 'Poppins', sans-serif;
@@ -509,64 +527,60 @@
             letter-spacing: 0.08em;
             margin-top: 4px;
             text-transform: lowercase;
+            text-align: center;
         }
+
         .testimonial-dots {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 8px;
-            margin-top: 28px;
+            margin: 26px auto 0;
+            position: relative;
+            z-index: 2;
         }
         .testimonial-dots .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #D1B89A;
+            width: 48px;
+            height: 12px;
+            border-radius: 0;
+            background: #9c9c9c;
             border: none;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: background 0.3s;
+            padding: 0;
         }
         .testimonial-dots .dot.active {
-            width: 22px;
-            border-radius: 10px;
-            background: #7B5E4A;
+            background: #3B2A20;
         }
 
-        /* ===== STEPS ===== */
+        /* ===== STEPS SECTION (1 halaman penuh) ===== */
         .steps-section {
             background-color: #D1B89A;
-            padding: clamp(88px, 11vw, 130px) 20px clamp(56px, 8vw, 100px);
+            min-height: 100svh;
+            padding: 90px 20px;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
             text-align: center;
             position: relative;
             z-index: 2;
-            margin-top: 0;
-        }
-        .steps-section::before {
-            content: '';
-            position: absolute;
-            top: calc(-1 * clamp(28px, 4vw, 52px));
-            left: 0;
-            width: 100%;
-            height: clamp(28px, 4vw, 52px);
-            background-color: #D1B89A;
-            clip-path: ellipse(120% 100% at 50% 100%);
-            pointer-events: none;
         }
         .steps-eyebrow {
             font-family: 'Poppins', sans-serif;
-            font-size: clamp(0.85rem, 1.1vw, 0.95rem);
-            color: #A67C52;
-            margin-bottom: 8px;
-            font-weight: 400;
+            font-size: clamp(1rem, 1.3vw, 1.15rem);
+            color: #3B2A20;
+            opacity: 1;
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
         }
         .steps-section h2 {
             font-family: 'Poppins', sans-serif;
             font-weight: 700;
             font-size: clamp(1.5rem, 2.8vw, 2.1rem);
             color: #3B2A20;
-            margin-bottom: clamp(36px, 5vw, 52px);
+            margin-bottom: clamp(32px, 4vw, 48px);
         }
         .steps-track {
             display: flex;
@@ -641,9 +655,14 @@
 
         /* ===== FOOTER ===== */
         footer {
-            background-color: #7B5E4A; color: #F2E7D5;
+            background-color: #7B5E4A;
+            color: #F2E7D5;
             padding: 36px clamp(24px, 4vw, 44px) 20px;
-            border-radius: 28px 28px 0 0; font-family: 'Poppins', sans-serif;
+            border-radius: 28px 28px 0 0;
+            font-family: 'Poppins', sans-serif;
+            position: relative;
+            z-index: 3;
+            margin-top: 0;
         }
         .footer-container {
             max-width: 1100px; margin: 0 auto 22px;
@@ -722,6 +741,8 @@
         @media (max-width: 480px) {
             .step-item { flex: 1 1 100%; max-width: 260px; }
             .lang-switch { font-size: 0.7rem; }
+            .testimonial-dots .dot { width: 36px; height: 10px; }
+            .testimonial-quote-icon { width: 36px; }
         }
     </style>
 </head>
@@ -782,17 +803,17 @@
                         <button type="submit" class="nav-search-btn" id="navSearchBtn" aria-label="Cari"><i class="fa-solid fa-magnifying-glass"></i></button>
                     </form>
 
-                    @if($isLoggedIn)
-                        <a href="{{ url('/profil') }}" class="navbar-avatar" aria-label="Profil">
-                            @if(!empty($userPhoto))
-                                <img src="{{ asset('storage/' . $userPhoto) }}" alt="Profile">
+                    @auth
+                        <a href="{{ url('/profil') }}" class="navbar-avatar" aria-label="Profil Saya" title="{{ auth()->user()->nama_lengkap }}">
+                            @if(auth()->user()->photo_url)
+                                <img src="{{ auth()->user()->photo_url }}" alt="Profile">
                             @else
-                                <span class="avatar-placeholder"><i class="fa-solid fa-user"></i></span>
+                                <span class="avatar-placeholder">{{ auth()->user()->inisial }}</span>
                             @endif
                         </a>
                     @else
                         <a href="{{ url('/register') }}" class="nav-daftar-btn">{{ __('Daftar | Masuk') }}</a>
-                    @endif
+                    @endauth
 
                     <button type="button" class="nav-hamburger" id="navHamburger" aria-label="Buka menu">
                         <i class="fa-solid fa-bars"></i>
@@ -853,8 +874,8 @@
     </section>
 
     <section class="branches-section" id="kontak-lokasi">
-        <img src="{{ asset('image/logo.png') }}" alt="Logo" class="branch-logo"
-             onerror="this.src='https://placehold.co/75x75/7B5E4A/ffffff?text=MH'">
+        <img src="{{ asset('image/logo.png') }}" alt="Tuhomestay Logo" class="branch-logo"
+             onerror="this.src='https://placehold.co/110x110/7B5E4A/ffffff?text=HT'">
         <h2>{{ __('Alamat Cabang') }}</h2>
         <p>{{ __('Pilih Cabang untuk melihat Google Maps') }}</p>
         <div class="branch-buttons">
@@ -876,11 +897,13 @@
         </div>
     </section>
 
-    {{-- TESTIMONIAL --}}
     <section class="testimonial-section">
         <h2>{{ __('Apa Yang Orang Bilang') }}</h2>
         <div class="testimonial-single">
-            <i class="fa-solid fa-quote-right testimonial-quote-icon"></i>
+            <img src="{{ asset('storage/properti/tanda_petik.png') }}"
+                 alt="Quote"
+                 class="testimonial-quote-icon"
+                 onerror="this.style.display='none'">
             <div class="testimonial-track-wrap" id="testiTrackWrap">
                 <div class="testimonial-track" id="testiTrack"></div>
             </div>
@@ -1034,7 +1057,6 @@
             window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
         }
 
-        // ===== Search: icon -> expand =====
         const navSearchForm = document.getElementById('navSearchForm');
         const navSearchInput = document.getElementById('navSearchInput');
         const navSearchBtn = document.getElementById('navSearchBtn');
@@ -1061,9 +1083,6 @@
             if (navSearchForm && !navSearchForm.contains(e.target)) collapseSearch();
         });
 
-        // ===== EN | ID language switch — pakai route, tidak perlu JS =====
-
-        // Page transition — KECUALIKAN link lang-switch
         document.querySelectorAll('a[href]').forEach(link => {
             if (link.closest('.lang-switch')) return;
 
@@ -1111,11 +1130,19 @@
                 </div>
             `).join('');
         }
+
         function updateTrackHeight() {
             if (!testiTrackWrap || !testiTrack) return;
             const activeSlide = testiTrack.children[testiIndex];
-            if (activeSlide) testiTrackWrap.style.height = activeSlide.offsetHeight + 'px';
+            if (!activeSlide) return;
+            // Ukur tinggi slide aktif tanpa terpengaruh transform
+            const currentTransform = testiTrack.style.transform;
+            testiTrack.style.transform = 'translateX(0)';
+            const height = activeSlide.offsetHeight;
+            testiTrack.style.transform = currentTransform;
+            testiTrackWrap.style.height = height + 'px';
         }
+
         function renderTestiDots() {
             if (!testiDots) return;
             testiDots.innerHTML = '';
@@ -1123,6 +1150,7 @@
                 const dot = document.createElement('button');
                 dot.type = 'button';
                 dot.className = 'dot' + (i === testiIndex ? ' active' : '');
+                dot.setAttribute('aria-label', 'Testimoni ' + (i + 1));
                 dot.addEventListener('click', () => showTesti(i, true));
                 testiDots.appendChild(dot);
             });
@@ -1131,7 +1159,7 @@
             if (!testiTrack) return;
             testiIndex = (index + testimonials.length) % testimonials.length;
             testiTrack.style.transform = `translateX(-${testiIndex * 100}%)`;
-            updateTrackHeight();
+            requestAnimationFrame(() => updateTrackHeight());
             renderTestiDots();
             if (isManual) { clearInterval(testiAutoplay); startTestiAutoplay(); }
         }
@@ -1140,11 +1168,19 @@
         }
         if (testiTrack) {
             buildTestiSlides();
-            requestAnimationFrame(() => {
-                updateTrackHeight();
-                renderTestiDots();
-                startTestiAutoplay();
-            });
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(() => {
+                    updateTrackHeight();
+                    renderTestiDots();
+                    startTestiAutoplay();
+                });
+            } else {
+                requestAnimationFrame(() => {
+                    updateTrackHeight();
+                    renderTestiDots();
+                    startTestiAutoplay();
+                });
+            }
             window.addEventListener('resize', updateTrackHeight);
         }
     </script>

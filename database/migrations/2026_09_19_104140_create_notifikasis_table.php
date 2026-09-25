@@ -8,12 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('notifikasis')) {
+            return;
+        }
+
         Schema::create('notifikasis', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_penyewa');
             $table->string('judul', 150);
             $table->text('pesan');
-            $table->timestamp('tg_kirim')->useCurrent();
+            $table->timestamp('tg_kirim')->nullable();
             $table->boolean('status_dibaca')->default(false);
             $table->timestamps();
 

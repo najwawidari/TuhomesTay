@@ -192,7 +192,7 @@
     <div class="split">
       @foreach($kamarsFleksibel->take(2) as $p)
         <div class="col">
-          <span class="sv">{{ $p->status === 'full' ? '1' : '0' }}/{{ $p->total_kamar }}</span>
+          <span class="sv">{{ $p->kamar_terisi }}/{{ $p->total_kamar }}</span>
           <span class="sl">{{ $p->nama_kamar }}</span>
         </div>
       @endforeach
@@ -203,7 +203,7 @@
     <div class="split">
       @foreach($kamarsRumahOnly->take(2) as $p)
         <div class="col">
-          <span class="sv" style="font-size:17px;">{{ $p->status === 'full' ? __('Penuh') : __('Tersedia') }}</span>
+          <span class="sv" style="font-size:17px;">{{ $p->status_ketersediaan === 'terisi' ? __('Penuh') : __('Tersedia') }}</span>
           <span class="sl">{{ $p->nama_kamar }}</span>
         </div>
       @endforeach
@@ -230,8 +230,10 @@
     $lokasiLabel = $p->cabang === 'batu' ? 'Batu, Punten' : 'Tulungagung';
     $isFleksibel = (bool) $p->fleksibel;
     $totalKamarProp = $isFleksibel ? ($p->total_kamar ?? 1) : 1;
-    $terisi = $p->status === 'full' ? 1 : 0;
-    $kosong = max(0, $totalKamarProp - $terisi);
+
+    $terisi = $p->kamar_terisi;
+    $kosong = $p->kamar_kosong;
+    $statusKetersediaan = $p->status_ketersediaan;
   @endphp
 
   <div class="property">
@@ -298,10 +300,14 @@
 
       <div class="roomgrid">
         @for($i = 1; $i <= $totalKamarProp; $i++)
-          <div class="roomcard {{ $i <= $terisi ? 'red' : 'blue' }}" tabindex="0">
+          @php
+            // GUNAKAN isKamarTerisi() untuk cek per-kamar
+            $isTerisi = $p->isKamarTerisi($i);
+          @endphp
+          <div class="roomcard {{ $isTerisi ? 'red' : 'blue' }}" tabindex="0">
             <div class="rc-face">
               <div class="rcode">{{ __('Kamar') }} {{ $i }}</div>
-              <span class="rstatus">{{ $i <= $terisi ? __('Terisi') : __('Kosong') }}</span>
+              <span class="rstatus">{{ $isTerisi ? __('Terisi') : __('Kosong') }}</span>
             </div>
             <div class="rc-detail">
               <div class="rtype">{{ __('Single Room') }}</div>
@@ -313,9 +319,9 @@
     @else
       <div class="wholehouse">
         <div class="wh-status">
-          <i class="dot-sm {{ $p->status === 'available' ? 'on' : 'off' }}"></i>
+          <i class="dot-sm {{ $statusKetersediaan === 'terisi' ? 'off' : 'on' }}"></i>
           <div>
-            {{ $p->status === 'available' ? __('Tersedia') : __('Penuh') }}
+            {{ $statusKetersediaan === 'terisi' ? __('Penuh') : __('Tersedia') }}
             <div class="wh-note">{{ __('Disewakan sebagai satu rumah utuh, tidak dipecah per kamar') }}</div>
           </div>
         </div>
@@ -374,13 +380,19 @@
         @forelse($kamars as $p)
           @if($p->fleksibel)
             @for($i = 1; $i <= ($p->total_kamar ?? 1); $i++)
+              @php $isTerisi = $p->isKamarTerisi($i); @endphp
               <tr>
                 <td><b>{{ __('Kamar') }} {{ $i }}</b></td>
                 <td>{{ $p->nama_kamar }} · {{ $p->cabang === 'batu' ? 'Batu, Punten' : 'Tulungagung' }}</td>
                 <td><span class="roomtype-tag">{{ __('Single Room') }}</span></td>
                 <td>Rp {{ number_format($p->harga_kamar ?? 150000, 0, ',', '.') }}</td>
-                <td><span class="status"><i class="dot-sm on"></i>{{ __('Kosong') }}</span></td>
-               <td><a class="detail-link" href="{{ route('admin.kamar.show', $p->id) }}">{{ __('Detail') }}</a></td>
+                <td>
+                  <span class="status">
+                    <i class="dot-sm {{ $isTerisi ? 'off' : 'on' }}"></i>
+                    {{ $isTerisi ? __('Terisi') : __('Kosong') }}
+                  </span>
+                </td>
+                <td><a class="detail-link" href="{{ route('admin.kamar.show', $p->id) }}">{{ __('Detail') }}</a></td>
               </tr>
             @endfor
           @else
@@ -391,11 +403,11 @@
               <td>Rp {{ number_format($p->harga, 0, ',', '.') }}</td>
               <td>
                 <span class="status">
-                  <i class="dot-sm {{ $p->status === 'available' ? 'on' : 'off' }}"></i>
-                  {{ $p->status === 'available' ? __('Kosong') : __('Terisi') }}
+                  <i class="dot-sm {{ $p->status_ketersediaan === 'terisi' ? 'off' : 'on' }}"></i>
+                  {{ $p->status_ketersediaan === 'terisi' ? __('Terisi') : __('Kosong') }}
                 </span>
               </td>
-             <td><a class="detail-link" href="{{ route('admin.kamar.show', $p->id) }}">{{ __('Detail') }}</a></td>
+              <td><a class="detail-link" href="{{ route('admin.kamar.show', $p->id) }}">{{ __('Detail') }}</a></td>
             </tr>
           @endif
         @empty
